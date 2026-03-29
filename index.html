@@ -48,7 +48,7 @@
   .progress-bar-bg { background:var(--primary-light); border-radius:10px; height:8px; overflow:hidden; }
   .progress-bar-fill { background:linear-gradient(90deg,var(--primary),var(--primary-dark)); height:100%; border-radius:10px; transition:width .4s ease; }
   .progress-dots { display:flex; justify-content:space-between; margin-top:10px; }
-  .dot { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.7rem; font-weight:700; background:var(--primary-light); color:var(--secondary-dark); border:2px solid var(--secondary); transition:all .3s ease; cursor:default; }
+  .dot { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.82rem; font-weight:700; background:var(--primary-light); color:var(--secondary-dark); border:2px solid var(--secondary); transition:all .3s ease; cursor:default; }
   .dot.active { background:var(--primary); color:#fff; border-color:var(--primary-dark); transform:scale(1.15); }
   .dot.done   { background:var(--primary-dark); color:#fff; border-color:var(--primary-dark); }
   .card { background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); padding:30px 28px; margin-bottom:20px; display:none; animation:fadeIn .35s ease; }
@@ -90,6 +90,16 @@
   .btn { padding:12px 28px; border:none; border-radius:30px; font-size:.93rem; font-weight:700; cursor:pointer; transition:all .2s; letter-spacing:.03em; }
   .btn-back { background:var(--primary-light); color:var(--primary-dark); }
   .btn-back:hover { background:#fde3c0; }
+  .btn-danger { background:#c0392b; color:#fff; box-shadow:0 4px 14px rgba(192,57,43,.3); }
+  .btn-danger:hover { background:#a93226; transform:translateY(-1px); box-shadow:0 6px 20px rgba(192,57,43,.4); }
+  .clear-modal-overlay { display:none; position:fixed; inset:0; z-index:500; background:rgba(0,0,0,.5); backdrop-filter:blur(3px); align-items:center; justify-content:center; }
+  .clear-modal-overlay.open { display:flex; }
+  .clear-modal { background:#fff; border-radius:var(--radius); padding:36px 32px; max-width:400px; width:92%; box-shadow:0 12px 48px rgba(0,0,0,.22); text-align:center; animation:fadeIn .2s ease; }
+  .clear-modal .warn-icon { font-size:2.4rem; display:block; margin-bottom:12px; }
+  .clear-modal h3 { color:#c0392b; font-size:1.15rem; font-weight:700; margin-bottom:10px; }
+  .clear-modal p { color:var(--grey-text); font-size:.9rem; line-height:1.6; margin-bottom:24px; }
+  .clear-modal p .jp-note { display:block; margin-top:8px; color:#aaa; font-size:.82rem; }
+  .clear-modal-btns { display:flex; gap:12px; justify-content:center; }
   .btn-next { background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; box-shadow:0 4px 14px rgba(231,129,29,.3); }
   .btn-next:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(231,129,29,.4); }
   .btn-next:disabled { opacity:.5; cursor:not-allowed; transform:none; }
@@ -206,8 +216,24 @@
       <button class="insights-btn" id="insights-btn" onclick="runAnalysis()">&#x2728; Generate AI Insights / AI&#x5206;&#x6790;&#x3092;&#x751F;&#x6210;</button>
       <div id="insights-output"></div>
     </div>
-    <div style="text-align:center;margin-top:20px;">
+    <div style="text-align:center;margin-top:20px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
       <button class="btn btn-back" onclick="loadDashboard()" style="font-size:.82rem;padding:9px 20px;">&#x1F504; Refresh Data / &#x30C7;&#x30FC;&#x30BF;&#x66F4;&#x65B0;</button>
+      <button class="btn btn-danger" onclick="confirmClear()" style="font-size:.82rem;padding:9px 20px;">&#x1F5D1; Clear All Data / &#x5168;&#x30C7;&#x30FC;&#x30BF;&#x524A;&#x9664;</button>
+    </div>
+  </div>
+</div>
+
+<div class="clear-modal-overlay" id="clear-modal-overlay">
+  <div class="clear-modal">
+    <span class="warn-icon">⚠️</span>
+    <h3>Clear All Responses?</h3>
+    <p>
+      This will permanently delete <strong>all survey responses</strong> from the Google Sheet and this device. This cannot be undone.
+      <span class="jp-note">全アンケート回答をシートとこの端末から完全に削除します。この操作は取り消せません。</span>
+    </p>
+    <div class="clear-modal-btns">
+      <button class="btn btn-back" onclick="document.getElementById('clear-modal-overlay').classList.remove('open')" style="min-width:120px;padding:10px 20px;">Cancel / キャンセル</button>
+      <button class="btn btn-danger" onclick="clearAllData()" style="min-width:120px;padding:10px 20px;">🗑️ Delete All / 全削除</button>
     </div>
   </div>
 </div>
@@ -379,7 +405,7 @@
     {emoji:"😊",label:"Good / 良い"},{emoji:"😄",label:"Very Good / とても良い"},
     {emoji:"😁",label:"Excellent / 優秀"},{emoji:"🤩",label:"Outstanding! / 素晴らしい！"}
   ];
-  const DOT_LABELS = ["😊","🏢","👤","⚙️","📣","💡","🍁"];
+  const DOT_LABELS = ["1","2","3","4","5","6","7"];
 
   window.onload = function() { generateLeaves(); buildDots(); initStars(); updateProgress(); updateMorale(5); };
 
@@ -401,7 +427,12 @@
 
   function updateProgress() {
     document.getElementById("progress-fill").style.width=Math.round(((currentStep+1)/STEPS)*100)+"%";
-    DOT_LABELS.forEach((_,i)=>{ document.getElementById("dot-"+i).className="dot"+(i<currentStep?" done":i===currentStep?" active":""); });
+    DOT_LABELS.forEach((l,i)=>{
+      const d=document.getElementById("dot-"+i);
+      const cls = i<currentStep?"done":i===currentStep?"active":"";
+      d.className="dot"+(cls?" "+cls:"");
+      d.textContent = i<currentStep ? "✓" : l;
+    });
   }
 
   function initStars() {
@@ -493,6 +524,25 @@
   }
   function openAdmin() { document.getElementById("admin-overlay").classList.add("open"); loadDashboard(); }
   function closeAdmin() { document.getElementById("admin-overlay").classList.remove("open"); }
+
+  function confirmClear() {
+    document.getElementById('clear-modal-overlay').classList.add('open');
+  }
+
+  async function clearAllData() {
+    document.getElementById('clear-modal-overlay').classList.remove('open');
+    showLoading("Clearing all data… / 全データを削除中…");
+    // Clear local device storage
+    localStorage.removeItem('jpn_survey_responses');
+    // Clear backend Google Sheet
+    if (SHEET_URL) {
+      try {
+        await fetch(SHEET_URL + "?action=clear", {method:"GET"});
+      } catch(e) { console.warn("Backend clear:", e); }
+    }
+    hideLoading();
+    await loadDashboard();
+  }
 
   async function fetchResponses() {
     if (SHEET_URL) {
