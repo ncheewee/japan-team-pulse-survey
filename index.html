@@ -7,35 +7,39 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --primary:        #e7811d;
-    --primary-dark:   #c4600f;
-    --primary-mid:    #f0a050;
-    --primary-light:  #fef3e8;
-    --secondary:      #c5c7af;
-    --secondary-dark: #7a7c6c;
-    --amber:          #f9a825;
+    --primary:        #d4547a;
+    --primary-dark:   #a83560;
+    --primary-mid:    #e8829f;
+    --primary-light:  #fde8f0;
+    --secondary:      #c5b8c0;
+    --secondary-dark: #7a6c72;
+    --amber:          #e8829f;
     --white:          #ffffff;
-    --off-white:      #f9f7f4;
+    --off-white:      #fdf7f9;
     --grey-text:      #5a5a5a;
     --dark-text:      #1c1c1c;
     --radius:         12px;
-    --shadow:         0 4px 24px rgba(231,129,29,.12);
+    --shadow:         0 4px 24px rgba(212,84,122,.13);
   }
   body {
     font-family: 'Helvetica Neue', 'Segoe UI', Arial, 'Hiragino Sans', sans-serif;
-    background: linear-gradient(160deg, #fff8f0 0%, #fef3e8 60%, #fde8cc 100%);
+    background: linear-gradient(160deg, #fff0f5 0%, #fde8f0 55%, #fbd5e6 100%);
     min-height: 100vh; color: var(--dark-text); overflow-x: hidden;
   }
   .petals { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; overflow:hidden; }
   .petal {
-    position: absolute; top:-40px; width:12px; height:14px;
-    background: radial-gradient(ellipse at 40% 30%, #f0a050 60%, #e7811d 100%);
-    border-radius: 50% 10% 50% 10%; opacity: 0.5; animation: fall linear infinite;
+    position: absolute; top:-40px;
+    width:14px; height:12px;
+    background: radial-gradient(ellipse at 40% 30%, #f9c8d8 60%, #e8829f 100%);
+    border-radius: 50% 0 50% 0;
+    opacity: 0.7;
+    animation: fall linear infinite;
   }
   @keyframes fall {
-    0%   { transform: translateY(0) rotate(0deg) translateX(0); opacity:.6; }
-    50%  { transform: translateY(50vh) rotate(180deg) translateX(30px); }
-    100% { transform: translateY(110vh) rotate(360deg) translateX(-20px); opacity:0; }
+    0%   { transform: translateY(0) rotate(0deg) translateX(0); opacity:.8; }
+    30%  { transform: translateY(30vh) rotate(120deg) translateX(20px); opacity:.6; }
+    60%  { transform: translateY(65vh) rotate(240deg) translateX(-15px); opacity:.4; }
+    100% { transform: translateY(110vh) rotate(360deg) translateX(10px); opacity:0; }
   }
   .container { position:relative; z-index:1; max-width:720px; margin:0 auto; padding:32px 20px 60px; }
   .header { text-align:center; background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); padding:36px 28px 28px; margin-bottom:28px; }
@@ -169,7 +173,7 @@
 <div class="petals" id="petals"></div>
 <button id="admin-btn" onclick="openLogin()">&#x1F510; Admin</button>
 <div id="loading-screen">
-  <div class="loading-leaf">&#x1F341;</div>
+  <div class="loading-leaf">🌸</div>
   <div id="loading-msg">Submitting your response&hellip;</div>
 </div>
 <div id="login-overlay">
@@ -240,11 +244,12 @@
 
 <div class="container">
   <div class="header">
-    <span class="maple-icon">&#x1F341;</span>
-    <h1>Japan PM/Procurement Team<span class="jp">&#x65E5;&#x672C; PM/&#x8ABF;&#x9054;&#x30C1;&#x30FC;&#x30E0; &mdash; &#x30C1;&#x30FC;&#x30E0;&#x30D1;&#x30EB;&#x30B9;&#x30B5;&#x30FC;&#x30D9;&#x30A4;</span></h1>
+    <span class="maple-icon">🌸</span>
+    <div style="display:inline-block;background:linear-gradient(135deg,#f9c8d8,#e8829f);color:#fff;font-size:.72rem;font-weight:700;padding:4px 14px;border-radius:20px;letter-spacing:.08em;margin-bottom:10px;">🌸 SPRING 2026 · 春のサーベイ</div>
+    <h1>Japan PM/Procurement Team<span class="jp">日本 PM/調達チーム &mdash; チームパルスサーベイ</span></h1>
     <p>Your honest feedback helps us grow together. This survey is <strong>completely anonymous</strong>.<br>
-    <span style="font-size:.85rem;color:#7a7c6c">&#x6B63;&#x76F4;&#x306A;&#x30D5;&#x30A3;&#x30FC;&#x30C9;&#x30D0;&#x30C3;&#x30AF;&#x304C;&#x79C1;&#x305F;&#x3061;&#x306E;&#x6210;&#x9577;&#x3092;&#x52A9;&#x3051;&#x307E;&#x3059;&#x3002;&#x3053;&#x306E;&#x30A2;&#x30F3;&#x30B1;&#x30FC;&#x30C8;&#x306F;<strong>&#x5B8C;&#x5168;&#x306B;&#x533F;&#x540D;</strong>&#x3067;&#x3059;&#x3002;</span></p>
-    <span class="anon-badge">&#x1F512; Anonymous &middot; &#x533F;&#x540D;</span>
+    <span style="font-size:.85rem;color:#7a6c72">正直なフィードバックが私たちの成長を助けます。このアンケートは<strong>完全に匿名</strong>です。</span></p>
+    <span class="anon-badge">🔒 Anonymous · 匿名</span>
   </div>
   <div class="progress-wrap">
     <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill" style="width:14%"></div></div>
@@ -377,16 +382,16 @@
       <button class="btn btn-back" onclick="goBack()">&larr; Back</button>
       <button class="btn btn-submit" onclick="submitForm()">
         <span class="submit-spinner" id="spinner">&#x27F3;</span>
-        Submit Survey &#x1F341; / &#x9001;&#x4FE1;&#x3059;&#x308B;
+        Submit Survey 🌸 / 送信する
       </button>
     </div>
   </div>
 
   <div id="thank-you" class="card">
-    <div class="ty-icon">&#x1F341;</div>
-    <h2>Thank you! <span class="jp">&#x3042;&#x308A;&#x304C;&#x3068;&#x3046;&#x3054;&#x3056;&#x3044;&#x307E;&#x3059;&#xFF01;</span></h2>
+    <div class="ty-icon">🌸</div>
+    <h2>Thank you! <span class="jp">ありがとうございます！</span></h2>
     <p>Your feedback has been received anonymously and will help shape a better workplace for everyone.<br><br>
-    <span style="color:#7a7c6c;font-size:.85rem">&#x3042;&#x306A;&#x305F;&#x306E;&#x30D5;&#x30A3;&#x30FC;&#x30C9;&#x30D0;&#x30C3;&#x30AF;&#x306F;&#x533F;&#x540D;&#x3067;&#x53D7;&#x3051;&#x53D6;&#x3089;&#x308C;&#x3001;&#x5168;&#x54E1;&#x306B;&#x3068;&#x3063;&#x3066;&#x3088;&#x308A;&#x826F;&#x3044;&#x8077;&#x5834;&#x3065;&#x304F;&#x308A;&#x306B;&#x5F79;&#x7ACB;&#x3066;&#x3089;&#x308C;&#x307E;&#x3059;&#x3002;</span></p>
+    <span style="color:#7a6c72;font-size:.85rem">あなたのフィードバックは匿名で受け取られ、全員にとってより良い職場づくりに役立てられます。</span></p>
   </div>
 </div>
 
@@ -411,11 +416,17 @@
 
   function generateLeaves() {
     const w = document.getElementById("petals");
-    for (let i=0;i<18;i++) {
+    const colors = ["#f9c8d8","#f0a8c0","#e8829f","#fbd5e6","#f5b8ce"];
+    for (let i=0;i<28;i++) {
       const p = document.createElement("div"); p.className="petal";
-      p.style.left=Math.random()*100+"%"; p.style.width=(10+Math.random()*10)+"px";
-      p.style.height=(12+Math.random()*10)+"px"; p.style.animationDuration=(5+Math.random()*8)+"s";
-      p.style.animationDelay=(Math.random()*8)+"s"; p.style.opacity=0.3+Math.random()*0.3;
+      const sz = 8 + Math.random()*12;
+      p.style.left=Math.random()*100+"%";
+      p.style.width=sz+"px"; p.style.height=(sz*0.85)+"px";
+      p.style.background=`radial-gradient(ellipse at 40% 30%, ${colors[Math.floor(Math.random()*colors.length)]} 60%, #d4547a 100%)`;
+      p.style.borderRadius = Math.random()>0.5 ? "50% 0 50% 0" : "40% 10% 40% 10%";
+      p.style.animationDuration=(6+Math.random()*9)+"s";
+      p.style.animationDelay=(Math.random()*10)+"s";
+      p.style.opacity=0.5+Math.random()*0.4;
       w.appendChild(p);
     }
   }
@@ -534,12 +545,17 @@
     showLoading("Clearing all data… / 全データを削除中…");
     // Clear local device storage
     localStorage.removeItem('jpn_survey_responses');
-    // Clear backend Google Sheet
+    // Clear backend Google Sheet via POST (same mode as submit)
     if (SHEET_URL) {
       try {
-        await fetch(SHEET_URL + "?action=clear", {method:"GET"});
-        // Wait for Sheet to process the delete before re-fetching
-        await new Promise(r => setTimeout(r, 1500));
+        await fetch(SHEET_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify({action:"clear"})
+        });
+        // Allow Apps Script time to finish deleting rows before re-fetch
+        await new Promise(r => setTimeout(r, 2500));
       } catch(e) { console.warn("Backend clear:", e); }
     }
     hideLoading();
