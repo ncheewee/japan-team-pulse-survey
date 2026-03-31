@@ -166,6 +166,14 @@
   .pw-input:focus { border-color:var(--primary); }
   .pw-error { color:#c62828; font-size:.83rem; display:none; margin-bottom:10px; }
   .pw-error.show { display:block; }
+  .review-section { margin-bottom:18px; }
+  .review-section-title { font-size:.8rem; font-weight:700; color:var(--primary-dark); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; padding-bottom:5px; border-bottom:1.5px solid var(--primary-light); }
+  .review-row { display:flex; justify-content:space-between; align-items:flex-start; padding:6px 0; font-size:.86rem; gap:10px; }
+  .review-row .rv-label { color:var(--secondary-dark); flex-shrink:0; width:52%; }
+  .review-row .rv-val { color:var(--dark-text); font-weight:600; text-align:right; }
+  .review-stars { color:var(--amber); letter-spacing:1px; }
+  .review-text { background:var(--off-white); border-left:3px solid var(--primary-mid); border-radius:0 8px 8px 0; padding:8px 12px; font-size:.84rem; color:var(--grey-text); line-height:1.5; margin-top:4px; font-style:italic; }
+  .review-empty { color:#bbb; font-size:.8rem; font-style:italic; }
   @media (max-width:520px) { .container{padding:20px 14px 50px} .card,.header{padding:22px 18px} #admin-panel{padding:24px 18px} .kpi-grid{grid-template-columns:repeat(2,1fr)} }
 </style>
 </head>
@@ -202,7 +210,7 @@
     </div>
     <div class="kpi-grid" id="kpi-grid">
       <div class="kpi-card"><div class="kpi-val" id="k-morale">&mdash;</div><div class="kpi-lbl">Avg Morale<span class="jp">&#x5E73;&#x5747;&#x58EB;&#x6C17;</span></div></div>
-      <div class="kpi-card"><div class="kpi-val" id="k-hq">&mdash;</div><div class="kpi-lbl">HQ Rating<span class="jp">HQ&#x8A55;&#x4FA1;</span></div></div>
+      <div class="kpi-card"><div class="kpi-val" id="k-hq">&mdash;</div><div class="kpi-lbl">HQ (GPM)<span class="jp">HQ評価</span></div></div>
       <div class="kpi-card"><div class="kpi-val" id="k-dept">&mdash;</div><div class="kpi-lbl">Dept Head<span class="jp">&#x90E8;&#x9580;&#x9577;&#x8A55;&#x4FA1;</span></div></div>
       <div class="kpi-card"><div class="kpi-val" id="k-process">&mdash;</div><div class="kpi-lbl">Processes<span class="jp">&#x696D;&#x52D9;&#x30D7;&#x30ED;&#x30BB;&#x30B9;</span></div></div>
       <div class="kpi-card"><div class="kpi-val" id="k-comms">&mdash;</div><div class="kpi-lbl">Comms<span class="jp">&#x30B3;&#x30DF;&#x30E5;&#x30CB;&#x30B1;&#x30FC;&#x30B7;&#x30E7;&#x30F3;</span></div></div>
@@ -220,27 +228,14 @@
       <button class="insights-btn" id="insights-btn" onclick="runAnalysis()">&#x2728; Generate AI Insights / AI&#x5206;&#x6790;&#x3092;&#x751F;&#x6210;</button>
       <div id="insights-output"></div>
     </div>
-    <div style="text-align:center;margin-top:20px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-      <button class="btn btn-back" onclick="loadDashboard()" style="font-size:.82rem;padding:9px 20px;">&#x1F504; Refresh Data / &#x30C7;&#x30FC;&#x30BF;&#x66F4;&#x65B0;</button>
-      <button class="btn btn-danger" onclick="confirmClear()" style="font-size:.82rem;padding:9px 20px;">&#x1F5D1; Clear All Data / &#x5168;&#x30C7;&#x30FC;&#x30BF;&#x524A;&#x9664;</button>
+    <div style="text-align:center;margin-top:20px;">
+      <button class="btn btn-back" onclick="loadDashboard()" style="font-size:.82rem;padding:9px 20px;">🔄 Refresh Data / データ更新</button>
     </div>
   </div>
 </div>
 
-<div class="clear-modal-overlay" id="clear-modal-overlay">
-  <div class="clear-modal">
-    <span class="warn-icon">⚠️</span>
-    <h3>Clear All Responses?</h3>
-    <p>
-      This will permanently delete <strong>all survey responses</strong> from the Google Sheet and this device. This cannot be undone.
-      <span class="jp-note">全アンケート回答をシートとこの端末から完全に削除します。この操作は取り消せません。</span>
-    </p>
-    <div class="clear-modal-btns">
-      <button class="btn btn-back" onclick="document.getElementById('clear-modal-overlay').classList.remove('open')" style="min-width:120px;padding:10px 20px;">Cancel / キャンセル</button>
-      <button class="btn btn-danger" onclick="clearAllData()" style="min-width:120px;padding:10px 20px;">🗑️ Delete All / 全削除</button>
-    </div>
-  </div>
-</div>
+
+
 
 <div class="container">
   <div class="header">
@@ -272,7 +267,7 @@
 
   <!-- STEP 1: HQ -->
   <div class="card" id="step-1">
-    <div class="section-title">&#x1F3E2; Feedback on HQ (Management) <span class="jp">HQ&#xFF08;&#x7D4C;&#x55B6;&#x9663;&#xFF09;&#x3078;&#x306E;&#x30D5;&#x30A3;&#x30FC;&#x30C9;&#x30D0;&#x30C3;&#x30AF;</span></div>
+    <div class="section-title">&#x1F3E2; Feedback on HQ (GPM) <span class="jp">HQ（GPM）&#x3078;&#x306E;&#x30D5;&#x30A3;&#x30FC;&#x30C9;&#x30D0;&#x30C3;&#x30AF;</span></div>
     <div class="section-desc">Rate each aspect of HQ leadership. 1 = Very Poor, 5 = Excellent.<br><span style="font-size:.82rem;color:#7a7c6c">HQ&#x30EA;&#x30FC;&#x30C0;&#x30FC;&#x30B7;&#x30C3;&#x30D7;&#x306E;&#x5404;&#x5074;&#x9762;&#x3092;&#x8A55;&#x4FA1;&#x3057;&#x3066;&#x304F;&#x3060;&#x3055;&#x3044;&#x3002;1=&#x975E;&#x5E38;&#x306B;&#x60AA;&#x3044;&#x3001;5=&#x512A;&#x79C0;</span></div>
     <div id="hq-ratings">
       <div class="rating-row"><div class="rating-label">Clear direction &amp; goals <span class="jp">&#x660E;&#x78BA;&#x306A;&#x65B9;&#x5411;&#x6027;&#x3068;&#x76EE;&#x6A19;</span></div><div class="stars" data-group="hq" data-idx="0"></div></div>
@@ -370,18 +365,85 @@
 
   <!-- STEP 6: COMMITMENT -->
   <div class="card" id="step-6">
-    <div class="section-title">&#x1F341; Your Personal Commitment <span class="jp">&#x500B;&#x4EBA;&#x306E;&#x30B3;&#x30DF;&#x30C3;&#x30C8;&#x30E1;&#x30F3;&#x30C8;</span></div>
-    <div class="section-desc">Name <strong>one thing</strong> you personally commit to doing to help create a better workplace.<br><span style="font-size:.82rem;color:#7a7c6c">&#x3088;&#x308A;&#x826F;&#x3044;&#x8077;&#x5834;&#x3092;&#x4F5C;&#x308B;&#x305F;&#x3081;&#x306B;&#x3001;&#x500B;&#x4EBA;&#x7684;&#x306B;&#x30B3;&#x30DF;&#x30C3;&#x30C8;&#x3059;&#x308B;<strong>&#x4E00;&#x3064;&#x306E;&#x3053;&#x3068;</strong>&#x3092;&#x66F8;&#x3044;&#x3066;&#x304F;&#x3060;&#x3055;&#x3044;&#x3002;</span></div>
+    <div class="section-title">🌸 Your Personal Commitment <span class="jp">個人のコミットメント</span></div>
+    <div class="section-desc">Name <strong>one thing</strong> you personally commit to doing to help create a better workplace.<br><span style="font-size:.82rem;color:#7a7c6c">より良い職場を作るために、個人的に<strong>一つのこと</strong>を責任をもってやり遂げます。</span></div>
     <div class="commitment-wrap">
-      <div class="pledge-icon">&#x1F91D;</div>
-      <p class="field-hint" style="text-align:center;margin-bottom:6px">&#x1F4AC; Type in English or Japanese / &#x82F1;&#x8A9E;&#x307E;&#x305F;&#x306F;&#x65E5;&#x672C;&#x8A9E;&#x3067;&#x5165;&#x529B;&#x3067;&#x304D;&#x307E;&#x3059;</p>
-      <textarea class="commitment-input" id="commitment" rows="4" placeholder="I commit to&hellip; / &#x79C1;&#x306F;&#x2026;&#x3059;&#x308B;&#x3053;&#x3068;&#x3092;&#x8A93;&#x3044;&#x307E;&#x3059;" oninput="scheduleTranslation('commitment','commitment-trans')"></textarea>
+      <div class="pledge-icon">🤝</div>
+      <p class="field-hint" style="text-align:center;margin-bottom:6px">💬 Type in English or Japanese / 英語または日本語で入力できます</p>
+      <textarea class="commitment-input" id="commitment" rows="4" placeholder="I commit to… / 私は…することを責任をもってやり遂げます" oninput="scheduleTranslation('commitment','commitment-trans')"></textarea>
       <div class="trans-preview" id="commitment-trans" style="text-align:left;margin-top:6px"></div>
     </div>
     <div class="btn-row">
       <button class="btn btn-back" onclick="goBack()">&larr; Back</button>
+      <button class="btn btn-next" onclick="goNext()">Review &rarr; / 確認 &rarr;</button>
+    </div>
+  </div>
+
+  <!-- STEP 7: REVIEW -->
+  <div class="card" id="step-7">
+    <div class="section-title">🔍 Review Your Responses <span class="jp">回答の確認</span></div>
+    <div class="section-desc">Please check your answers before submitting. Tap Back to make changes.<br><span style="font-size:.82rem;color:#7a6c72">送信前に回答をご確認ください。修正する場合は「戻る」を押してください。</span></div>
+
+    <!-- Morale -->
+    <div class="review-section">
+      <div class="review-section-title">😊 Overall Morale / 全体的な士気</div>
+      <div class="review-row"><span class="rv-label">Morale score / 士気スコア</span><span class="rv-val" id="rv-morale">—</span></div>
+    </div>
+
+    <!-- HQ -->
+    <div class="review-section">
+      <div class="review-section-title">🏢 HQ (GPM)</div>
+      <div class="review-row"><span class="rv-label">Clear direction & goals</span><span class="rv-val review-stars" id="rv-hq-0">—</span></div>
+      <div class="review-row"><span class="rv-label">Support & resources</span><span class="rv-val review-stars" id="rv-hq-1">—</span></div>
+      <div class="review-row"><span class="rv-label">Transparency & comms</span><span class="rv-val review-stars" id="rv-hq-2">—</span></div>
+      <div class="review-row"><span class="rv-label">Recognition & appreciation</span><span class="rv-val review-stars" id="rv-hq-3">—</span></div>
+      <div id="rv-hq-comment"></div>
+    </div>
+
+    <!-- Dept Head -->
+    <div class="review-section">
+      <div class="review-section-title">👤 Department Head / 部門長</div>
+      <div class="review-row"><span class="rv-label">Leadership & guidance</span><span class="rv-val review-stars" id="rv-dept-0">—</span></div>
+      <div class="review-row"><span class="rv-label">Availability & approachability</span><span class="rv-val review-stars" id="rv-dept-1">—</span></div>
+      <div class="review-row"><span class="rv-label">Fairness & consistency</span><span class="rv-val review-stars" id="rv-dept-2">—</span></div>
+      <div class="review-row"><span class="rv-label">Motivates & inspires</span><span class="rv-val review-stars" id="rv-dept-3">—</span></div>
+      <div id="rv-dept-comment"></div>
+    </div>
+
+    <!-- Processes -->
+    <div class="review-section">
+      <div class="review-section-title">⚙️ Work Processes / 業務プロセス</div>
+      <div class="review-row"><span class="rv-label">Clarity of roles & responsibilities</span><span class="rv-val review-stars" id="rv-process-0">—</span></div>
+      <div class="review-row"><span class="rv-label">Efficiency of workflows & tools</span><span class="rv-val review-stars" id="rv-process-1">—</span></div>
+      <div class="review-row"><span class="rv-label">Reasonable workload & priorities</span><span class="rv-val review-stars" id="rv-process-2">—</span></div>
+      <div class="review-row"><span class="rv-label">Cross-team collaboration</span><span class="rv-val review-stars" id="rv-process-3">—</span></div>
+      <div id="rv-bottleneck"></div>
+    </div>
+
+    <!-- Comms -->
+    <div class="review-section">
+      <div class="review-section-title">📣 Communication / コミュニケーション</div>
+      <div class="review-row"><span class="rv-label">Timely & relevant updates</span><span class="rv-val review-stars" id="rv-comms-0">—</span></div>
+      <div class="review-row"><span class="rv-label">Openness to feedback</span><span class="rv-val review-stars" id="rv-comms-1">—</span></div>
+      <div class="review-row"><span class="rv-label">Clarity of messages</span><span class="rv-val review-stars" id="rv-comms-2">—</span></div>
+      <div class="review-row"><span class="rv-label">Psychological safety</span><span class="rv-val review-stars" id="rv-comms-3">—</span></div>
+      <div id="rv-comms-improvement"></div>
+    </div>
+
+    <!-- Suggestions & Commitment -->
+    <div class="review-section">
+      <div class="review-section-title">💡 Suggestions / 提案</div>
+      <div id="rv-suggestions"></div>
+    </div>
+    <div class="review-section">
+      <div class="review-section-title">🌸 Personal Commitment / 個人のコミットメント</div>
+      <div id="rv-commitment"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-back" onclick="goBack()">&larr; Back / 戻る</button>
       <button class="btn btn-submit" onclick="submitForm()">
-        <span class="submit-spinner" id="spinner">&#x27F3;</span>
+        <span class="submit-spinner" id="spinner">⟳</span>
         Submit Survey 🌸 / 送信する
       </button>
     </div>
@@ -399,7 +461,7 @@
   const SHEET_URL = "https://script.google.com/macros/s/AKfycbx5wEIRrm-b1_nf_cpG1zfwjErKfula5F5AMsuRYOrtSF8f1J-Qsgir72bOf1RSq36E/exec";
   const ANTHROPIC_KEY = "YOUR_ANTHROPIC_API_KEY"; // replace to enable AI narrative
 
-  const STEPS = 7;
+  const STEPS = 8;
   let currentStep = 0;
   const ratings = { hq:[0,0,0,0], dept:[0,0,0,0], process:[0,0,0,0], comms:[0,0,0,0] };
   const STEP_RATING_GROUP = {1:'hq',2:'dept',3:'process',4:'comms'};
@@ -410,7 +472,7 @@
     {emoji:"😊",label:"Good / 良い"},{emoji:"😄",label:"Very Good / とても良い"},
     {emoji:"😁",label:"Excellent / 優秀"},{emoji:"🤩",label:"Outstanding! / 素晴らしい！"}
   ];
-  const DOT_LABELS = ["1","2","3","4","5","6","7"];
+  const DOT_LABELS = ["1","2","3","4","5","6","7","8"];
 
   window.onload = function() { generateLeaves(); buildDots(); initStars(); updateProgress(); updateMorale(5); };
 
@@ -490,9 +552,45 @@
     if (currentStep<STEPS-1) {
       document.getElementById("step-"+currentStep).classList.remove("active");
       currentStep++;
+      if (currentStep===7) populateReview();
       document.getElementById("step-"+currentStep).classList.add("active");
       updateProgress(); window.scrollTo({top:0,behavior:"smooth"});
     }
+  }
+
+  function starsHtml(val) {
+    return '★'.repeat(val) + '☆'.repeat(5-val) + ` (${val}/5)`;
+  }
+
+  function reviewText(elId, text) {
+    const el = document.getElementById(elId);
+    if (text && text.trim()) {
+      el.innerHTML = `<div class="review-text">${text.trim()}</div>`;
+    } else {
+      el.innerHTML = `<div class="review-empty">— No comment / コメントなし</div>`;
+    }
+  }
+
+  function populateReview() {
+    // Morale
+    const moraleVal = parseInt(document.getElementById("morale-slider").value);
+    const mm = MORALE_META[moraleVal];
+    document.getElementById("rv-morale").textContent = `${mm.emoji} ${moraleVal}/10 — ${mm.label}`;
+
+    // Star ratings
+    ['hq','dept','process','comms'].forEach(group => {
+      ratings[group].forEach((v,i) => {
+        document.getElementById(`rv-${group}-${i}`).textContent = starsHtml(v);
+      });
+    });
+
+    // Open text
+    reviewText('rv-hq-comment',       document.getElementById("hq-comment").value);
+    reviewText('rv-dept-comment',     document.getElementById("dept-comment").value);
+    reviewText('rv-bottleneck',       document.getElementById("bottleneck").value);
+    reviewText('rv-comms-improvement',document.getElementById("comms-improvement").value);
+    reviewText('rv-suggestions',      document.getElementById("suggestions").value);
+    reviewText('rv-commitment',       document.getElementById("commitment").value);
   }
 
   function goBack() {
@@ -519,7 +617,7 @@
     if (SHEET_URL) { try { await fetch(SHEET_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)}); } catch(e){console.warn(e);} }
     const s=JSON.parse(localStorage.getItem("jpn_survey_responses")||"[]"); s.push(p); localStorage.setItem("jpn_survey_responses",JSON.stringify(s));
     hideLoading();
-    document.getElementById("step-6").classList.remove("active");
+    document.getElementById("step-7").classList.remove("active");
     document.getElementById("thank-you").style.display="block";
     window.scrollTo({top:0,behavior:"smooth"});
   }
@@ -666,13 +764,13 @@
 
   function generateRuleBasedAnalysis(s) {
     const lbl=(v,mx)=>{const n=parseFloat(v),p=(n/mx)*100;return isNaN(n)?"N/A":p>=80?"Strong ✅":p>=60?"Moderate 🟡":"Needs attention 🔴";};
-    const areas={"HQ (Management)":parseFloat(s.hqRating),"Department Head":parseFloat(s.deptRating),"Work Processes":parseFloat(s.processRating),"Communication":parseFloat(s.commsRating)};
+    const areas={"HQ (GPM)":parseFloat(s.hqRating),"Department Head":parseFloat(s.deptRating),"Work Processes":parseFloat(s.processRating),"Communication":parseFloat(s.commsRating)};
     const sorted=Object.entries(areas).filter(([,v])=>!isNaN(v)).sort((a,b)=>a[1]-b[1]);
     const mv=parseFloat(s.avgMorale), ms=mv>=7?"positive":mv>=5?"mixed":"concerning";
     let o=`📊 JAPAN TEAM PULSE SURVEY — ANALYSIS REPORT\n${"═".repeat(50)}\nResponses analysed: ${s.totalResponses}\n\n`;
     o+=`━━━ 1. OVERALL HEALTH ━━━━━━━━━━━━━━━━━━━━━━━━━━\nTeam morale is ${ms} at ${s.avgMorale}/10. `;
     o+=mv>=7?"The team appears engaged and motivated overall.":mv>=5?"There is room for improvement in team engagement.":"Morale is below acceptable levels — urgent attention required.";
-    o+=`\n\n━━━ 2. RATINGS SUMMARY ━━━━━━━━━━━━━━━━━━━━━━━━\n• HQ (Management): ${s.hqRating}/5 — ${lbl(s.hqRating,5)}\n• Department Head:  ${s.deptRating}/5 — ${lbl(s.deptRating,5)}\n• Work Processes:   ${s.processRating}/5 — ${lbl(s.processRating,5)}\n• Communication:    ${s.commsRating}/5 — ${lbl(s.commsRating,5)}\n`;
+    o+=`\n\n━━━ 2. RATINGS SUMMARY ━━━━━━━━━━━━━━━━━━━━━━━━\n• HQ (GPM): ${s.hqRating}/5 — ${lbl(s.hqRating,5)}\n• Department Head:  ${s.deptRating}/5 — ${lbl(s.deptRating,5)}\n• Work Processes:   ${s.processRating}/5 — ${lbl(s.processRating,5)}\n• Communication:    ${s.commsRating}/5 — ${lbl(s.commsRating,5)}\n`;
     const st=sorted.filter(([,v])=>v>=4), fl=sorted.filter(([,v])=>v<3.5);
     if (st.length){o+=`\n━━━ 3. KEY STRENGTHS ━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;st.forEach(([n,v])=>{o+=`• ${n} (${v.toFixed(1)}/5) performing well\n`;});}
     if (fl.length){o+=`\n━━━ 4. RED FLAGS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;fl.forEach(([n,v])=>{o+=`🔴 ${n} rated ${v.toFixed(1)}/5 — immediate attention needed\n`;});}
@@ -715,7 +813,7 @@
       }
     };
     if (ANTHROPIC_KEY&&ANTHROPIC_KEY!=="YOUR_ANTHROPIC_API_KEY") {
-      const prompt=`You are an expert HR consultant analysing anonymous team pulse survey data for a Japan Property Management/Procurement Department.\n\nData (${sum.totalResponses} responses): morale ${sum.avgMorale}/10, HQ ${sum.hqRating}/5, DeptHead ${sum.deptRating}/5, Processes ${sum.processRating}/5, Comms ${sum.commsRating}/5\n\nOpen text: HQ:${JSON.stringify(sum.openTexts.hqComments)} Dept:${JSON.stringify(sum.openTexts.deptComments)} Bottlenecks:${JSON.stringify(sum.openTexts.bottlenecks)} Comms:${JSON.stringify(sum.openTexts.commsImprovements)} Suggestions:${JSON.stringify(sum.openTexts.suggestions)}\n\nProvide: 1.OVERALL HEALTH 2.KEY STRENGTHS 3.RED FLAGS 4.KEY THEMES 5.TOP 5 ACTIONS. Be concise and actionable.`;
+      const prompt=`You are an expert HR consultant analysing anonymous team pulse survey data for a Japan PM/Procurement Department (GPM).\n\nData (${sum.totalResponses} responses): morale ${sum.avgMorale}/10, HQ ${sum.hqRating}/5, DeptHead ${sum.deptRating}/5, Processes ${sum.processRating}/5, Comms ${sum.commsRating}/5\n\nOpen text: HQ:${JSON.stringify(sum.openTexts.hqComments)} Dept:${JSON.stringify(sum.openTexts.deptComments)} Bottlenecks:${JSON.stringify(sum.openTexts.bottlenecks)} Comms:${JSON.stringify(sum.openTexts.commsImprovements)} Suggestions:${JSON.stringify(sum.openTexts.suggestions)}\n\nProvide: 1.OVERALL HEALTH 2.KEY STRENGTHS 3.RED FLAGS 4.KEY THEMES 5.TOP 5 ACTIONS. Be concise and actionable.`;
       try {
         const resp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":ANTHROPIC_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-opus-4-6",max_tokens:1200,messages:[{role:"user",content:prompt}]})});
         if (resp.ok){const d=await resp.json(); out.textContent=d.content?.[0]?.text||generateRuleBasedAnalysis(sum);}
