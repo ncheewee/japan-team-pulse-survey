@@ -3,43 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Japan Team Pulse Survey | チームパルスサーベイ</title>
+<title>Japan Team Pulse Survey — Summer | 夏のチームパルスサーベイ</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --primary:        #d4547a;
-    --primary-dark:   #a83560;
-    --primary-mid:    #e8829f;
-    --primary-light:  #fde8f0;
-    --secondary:      #c5b8c0;
-    --secondary-dark: #7a6c72;
-    --amber:          #e8829f;
+    --primary:        #e0913a;
+    --primary-dark:   #a8501f;
+    --primary-mid:    #eeab5c;
+    --primary-light:  #fdf0dc;
+    --secondary:      #7d97a8;
+    --secondary-dark: #2f4a5e;
+    --amber:          #eeab5c;
     --white:          #ffffff;
-    --off-white:      #fdf7f9;
+    --off-white:      #fbf8f2;
     --grey-text:      #5a5a5a;
     --dark-text:      #1c1c1c;
     --radius:         12px;
-    --shadow:         0 4px 24px rgba(212,84,122,.13);
+    --shadow:         0 4px 24px rgba(24,58,84,.18);
   }
   body {
     font-family: 'Helvetica Neue', 'Segoe UI', Arial, 'Hiragino Sans', sans-serif;
-    background: linear-gradient(160deg, #fff0f5 0%, #fde8f0 55%, #fbd5e6 100%);
+    background: linear-gradient(160deg, #0f2942 0%, #16395a 55%, #1c4666 100%);
     min-height: 100vh; color: var(--dark-text); overflow-x: hidden;
   }
   .petals { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; overflow:hidden; }
   .petal {
-    position: absolute; top:-40px;
-    width:14px; height:12px;
-    background: radial-gradient(ellipse at 40% 30%, #f9c8d8 60%, #e8829f 100%);
-    border-radius: 50% 0 50% 0;
+    position: absolute; bottom:-20px;
+    width:6px; height:6px;
+    background: radial-gradient(circle, #fef3c7 0%, #f5d576 55%, rgba(245,213,118,0) 75%);
+    border-radius: 50%;
     opacity: 0.7;
-    animation: fall linear infinite;
+    box-shadow: 0 0 6px 2px rgba(245,213,118,.6);
+    animation: rise linear infinite;
   }
-  @keyframes fall {
-    0%   { transform: translateY(0) rotate(0deg) translateX(0); opacity:.8; }
-    30%  { transform: translateY(30vh) rotate(120deg) translateX(20px); opacity:.6; }
-    60%  { transform: translateY(65vh) rotate(240deg) translateX(-15px); opacity:.4; }
-    100% { transform: translateY(110vh) rotate(360deg) translateX(10px); opacity:0; }
+  @keyframes rise {
+    0%   { transform: translateY(0) translateX(0); opacity:0; }
+    10%  { opacity:.9; }
+    50%  { transform: translateY(-55vh) translateX(15px); opacity:.6; }
+    85%  { opacity:.3; }
+    100% { transform: translateY(-105vh) translateX(-10px); opacity:0; }
   }
   .container { position:relative; z-index:1; max-width:720px; margin:0 auto; padding:32px 20px 60px; }
   .header { text-align:center; background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); padding:36px 28px 28px; margin-bottom:28px; }
@@ -61,6 +63,13 @@
   .section-title { font-size:1.15rem; font-weight:700; color:var(--primary-dark); margin-bottom:4px; }
   .section-title .jp { font-size:.85rem; color:var(--primary); font-weight:400; display:block; margin-top:1px; }
   .section-desc { font-size:.87rem; color:var(--grey-text); margin-bottom:22px; line-height:1.6; }
+  .choice-row { display:flex; flex-wrap:wrap; gap:10px; margin:14px 0 6px; }
+  .choice-btn { flex:1 1 auto; min-width:110px; padding:12px 10px; border-radius:12px; border:1.5px solid var(--secondary); background:var(--off-white); color:var(--dark-text); font-size:.85rem; font-weight:600; text-align:center; cursor:pointer; transition:all .2s; line-height:1.3; }
+  .choice-btn .jp-sm { display:block; font-size:.72rem; font-weight:500; color:var(--grey-text); margin-top:2px; }
+  .choice-btn:hover { border-color:var(--primary-mid); }
+  .choice-btn.selected { background:linear-gradient(135deg,var(--primary),var(--primary-dark)); border-color:var(--primary-dark); color:#fff; }
+  .choice-btn.selected .jp-sm { color:rgba(255,255,255,.85); }
+  .followup-box { background:var(--primary-light); border-radius:var(--radius); padding:18px 20px; margin:22px 0; border:1px solid var(--primary-mid); }
   .morale-wrap { text-align:center; padding:10px 0; }
   .morale-emoji { font-size:3.5rem; margin-bottom:6px; transition:all .3s; }
   .morale-label { font-size:1.1rem; font-weight:600; color:var(--primary-dark); margin-bottom:18px; }
@@ -181,7 +190,7 @@
 <div class="petals" id="petals"></div>
 <button id="admin-btn" onclick="openLogin()">&#x1F510; Admin</button>
 <div id="loading-screen">
-  <div class="loading-leaf">🌸</div>
+  <div class="loading-leaf">🏮</div>
   <div id="loading-msg">Submitting your response&hellip;</div>
 </div>
 <div id="login-overlay">
@@ -239,11 +248,11 @@
 
 <div class="container">
   <div class="header">
-    <span class="maple-icon">🌸</span>
-    <div style="display:inline-block;background:linear-gradient(135deg,#f9c8d8,#e8829f);color:#fff;font-size:.72rem;font-weight:700;padding:4px 14px;border-radius:20px;letter-spacing:.08em;margin-bottom:10px;">🌸 SPRING 2026 · 春のサーベイ</div>
+    <span class="maple-icon">🏮</span>
+    <div style="display:inline-block;background:linear-gradient(135deg,#eeab5c,#a8501f);color:#fff;font-size:.72rem;font-weight:700;padding:4px 14px;border-radius:20px;letter-spacing:.08em;margin-bottom:10px;">🎆 SUMMER 2026 · ROUND 2 · 夏のサーベイ・第2回</div>
     <h1>Japan PM/Procurement Team<span class="jp">日本 PM/調達チーム &mdash; チームパルスサーベイ</span></h1>
-    <p>Your honest feedback helps us grow together. This survey is <strong>completely anonymous</strong>.<br>
-    <span style="font-size:.85rem;color:#7a6c72">正直なフィードバックが私たちの成長を助けます。このアンケートは<strong>完全に匿名</strong>です。</span></p>
+    <p>Round two! Your honest feedback helps us grow together. This survey is <strong>completely anonymous</strong>.<br>
+    <span style="font-size:.85rem;color:#7a6c72">第2回です。正直なフィードバックが私たちの成長を助けます。このアンケートは<strong>完全に匿名</strong>です。</span></p>
     <span class="anon-badge">🔒 Anonymous · 匿名</span>
   </div>
   <div class="progress-wrap">
@@ -262,6 +271,19 @@
       <div class="morale-scale"><span>1 &mdash; Low</span><span>10 &mdash; High</span></div>
       <div class="morale-value" id="morale-num">5</div>
     </div>
+
+    <div class="followup-box">
+      <label class="field-label">🔄 Since the Spring survey, how do things feel? <span class="jp">春のサーベイ以降、状況はどう変わりましたか？</span></label>
+      <div class="choice-row" id="progress-choice">
+        <div class="choice-btn" data-val="improved" onclick="selectChoice('progress-choice','progress',this)">📈 Improved<span class="jp-sm">改善した</span></div>
+        <div class="choice-btn" data-val="same" onclick="selectChoice('progress-choice','progress',this)">➡️ About the same<span class="jp-sm">変わらない</span></div>
+        <div class="choice-btn" data-val="worse" onclick="selectChoice('progress-choice','progress',this)">📉 Worse<span class="jp-sm">悪化した</span></div>
+      </div>
+      <p class="field-hint">💬 What's driving that? (optional) / 何が理由ですか？（任意）</p>
+      <textarea id="progress-comment" rows="2" placeholder="e.g. new process helped, workload still heavy&hellip; / 例：新しいプロセスが役立った、業務量はまだ多い&hellip;" oninput="scheduleTranslation('progress-comment','progress-comment-trans')"></textarea>
+      <div class="trans-preview" id="progress-comment-trans"></div>
+    </div>
+
     <div class="btn-row"><button class="btn btn-next" onclick="goNext()">Next &rarr;</button></div>
   </div>
 
@@ -365,8 +387,19 @@
 
   <!-- STEP 6: COMMITMENT -->
   <div class="card" id="step-6">
-    <div class="section-title">🌸 Your Personal Commitment <span class="jp">個人のコミットメント</span></div>
-    <div class="section-desc">Name <strong>one thing</strong> you personally commit to doing to help create a better workplace.<br><span style="font-size:.82rem;color:#7a7c6c">より良い職場を作るために、個人的に<strong>一つのこと</strong>を責任をもってやり遂げます。</span></div>
+    <div class="section-title">🎐 Your Personal Commitment <span class="jp">個人のコミットメント</span></div>
+
+    <div class="followup-box">
+      <label class="field-label">✅ Did you follow through on your Spring commitment? <span class="jp">春に立てたコミットメントは実行できましたか？</span></label>
+      <div class="choice-row" id="followthrough-choice">
+        <div class="choice-btn" data-val="fully" onclick="selectChoice('followthrough-choice','followthrough',this)">✅ Fully<span class="jp-sm">完全に実行</span></div>
+        <div class="choice-btn" data-val="partially" onclick="selectChoice('followthrough-choice','followthrough',this)">🔶 Partially<span class="jp-sm">一部実行</span></div>
+        <div class="choice-btn" data-val="no" onclick="selectChoice('followthrough-choice','followthrough',this)">❌ Not really<span class="jp-sm">できなかった</span></div>
+        <div class="choice-btn" data-val="na" onclick="selectChoice('followthrough-choice','followthrough',this)">➖ N/A<span class="jp-sm">未回答・該当なし</span></div>
+      </div>
+    </div>
+
+    <div class="section-desc">Now, for this round: name <strong>one thing</strong> you personally commit to doing to help create a better workplace.<br><span style="font-size:.82rem;color:#7a7c6c">今回も、より良い職場を作るために、個人的に<strong>一つのこと</strong>を責任をもってやり遂げます。</span></div>
     <div class="commitment-wrap">
       <div class="pledge-icon">🤝</div>
       <p class="field-hint" style="text-align:center;margin-bottom:6px">💬 Type in English or Japanese / 英語または日本語で入力できます</p>
@@ -388,6 +421,8 @@
     <div class="review-section">
       <div class="review-section-title">😊 Overall Morale / 全体的な士気</div>
       <div class="review-row"><span class="rv-label">Morale score / 士気スコア</span><span class="rv-val" id="rv-morale">—</span></div>
+      <div class="review-row"><span class="rv-label">Since Spring / 春以降</span><span class="rv-val" id="rv-progress">—</span></div>
+      <div id="rv-progress-comment"></div>
     </div>
 
     <!-- HQ -->
@@ -436,7 +471,8 @@
       <div id="rv-suggestions"></div>
     </div>
     <div class="review-section">
-      <div class="review-section-title">🌸 Personal Commitment / 個人のコミットメント</div>
+      <div class="review-section-title">🎐 Personal Commitment / 個人のコミットメント</div>
+      <div class="review-row"><span class="rv-label">Followed through on Spring commitment? / 春のコミットメント達成度</span><span class="rv-val" id="rv-followthrough">—</span></div>
       <div id="rv-commitment"></div>
     </div>
 
@@ -444,13 +480,13 @@
       <button class="btn btn-back" onclick="goBack()">&larr; Back / 戻る</button>
       <button class="btn btn-submit" onclick="submitForm()">
         <span class="submit-spinner" id="spinner">⟳</span>
-        Submit Survey 🌸 / 送信する
+        Submit Survey 🎆 / 送信する
       </button>
     </div>
   </div>
 
   <div id="thank-you" class="card">
-    <div class="ty-icon">🌸</div>
+    <div class="ty-icon">🎆</div>
     <h2>Thank you! <span class="jp">ありがとうございます！</span></h2>
     <p>Your feedback has been received anonymously and will help shape a better workplace for everyone.<br><br>
     <span style="color:#7a6c72;font-size:.85rem">あなたのフィードバックは匿名で受け取られ、全員にとってより良い職場づくりに役立てられます。</span></p>
@@ -476,19 +512,28 @@
 
   window.onload = function() { generateLeaves(); buildDots(); initStars(); updateProgress(); updateMorale(5); };
 
+  const choiceAnswers = { progress:null, followthrough:null };
+  function selectChoice(wrapId, key, el) {
+    const wrap = document.getElementById(wrapId);
+    wrap.querySelectorAll(".choice-btn").forEach(b=>b.classList.remove("selected"));
+    el.classList.add("selected");
+    choiceAnswers[key] = el.dataset.val;
+  }
+
   function generateLeaves() {
     const w = document.getElementById("petals");
-    const colors = ["#f9c8d8","#f0a8c0","#e8829f","#fbd5e6","#f5b8ce"];
+    const colors = ["#fef3c7","#f5d576","#fcd34d","#fde68a"];
     for (let i=0;i<28;i++) {
       const p = document.createElement("div"); p.className="petal";
-      const sz = 8 + Math.random()*12;
+      const sz = 4 + Math.random()*5;
       p.style.left=Math.random()*100+"%";
-      p.style.width=sz+"px"; p.style.height=(sz*0.85)+"px";
-      p.style.background=`radial-gradient(ellipse at 40% 30%, ${colors[Math.floor(Math.random()*colors.length)]} 60%, #d4547a 100%)`;
-      p.style.borderRadius = Math.random()>0.5 ? "50% 0 50% 0" : "40% 10% 40% 10%";
-      p.style.animationDuration=(6+Math.random()*9)+"s";
+      p.style.width=sz+"px"; p.style.height=sz+"px";
+      const c = colors[Math.floor(Math.random()*colors.length)];
+      p.style.background=`radial-gradient(circle, ${c} 0%, rgba(245,213,118,0) 75%)`;
+      p.style.boxShadow=`0 0 6px 2px ${c}99`;
+      p.style.animationDuration=(7+Math.random()*10)+"s";
       p.style.animationDelay=(Math.random()*10)+"s";
-      p.style.opacity=0.5+Math.random()*0.4;
+      p.style.opacity=0.4+Math.random()*0.5;
       w.appendChild(p);
     }
   }
@@ -577,6 +622,13 @@
     const mm = MORALE_META[moraleVal];
     document.getElementById("rv-morale").textContent = `${mm.emoji} ${moraleVal}/10 — ${mm.label}`;
 
+    const PROGRESS_LABELS = {improved:"📈 Improved / 改善した", same:"➡️ About the same / 変わらない", worse:"📉 Worse / 悪化した"};
+    document.getElementById("rv-progress").textContent = choiceAnswers.progress ? PROGRESS_LABELS[choiceAnswers.progress] : "— Not answered / 未回答";
+    reviewText('rv-progress-comment', document.getElementById("progress-comment").value);
+
+    const FOLLOWTHROUGH_LABELS = {fully:"✅ Fully / 完全に実行", partially:"🔶 Partially / 一部実行", no:"❌ Not really / できなかった", na:"➖ N/A / 該当なし"};
+    document.getElementById("rv-followthrough").textContent = choiceAnswers.followthrough ? FOLLOWTHROUGH_LABELS[choiceAnswers.followthrough] : "— Not answered / 未回答";
+
     // Star ratings
     ['hq','dept','process','comms'].forEach(group => {
       ratings[group].forEach((v,i) => {
@@ -604,12 +656,15 @@
 
   async function submitForm() {
     const p={
+      season:"summer",
       morale:parseInt(document.getElementById("morale-slider").value),
+      progressSinceLast:choiceAnswers.progress||"", progressComment:document.getElementById("progress-comment").value.trim(),
       hq:[...ratings.hq], hqComment:document.getElementById("hq-comment").value.trim(),
       dept:[...ratings.dept], deptComment:document.getElementById("dept-comment").value.trim(),
       process:[...ratings.process], bottleneck:document.getElementById("bottleneck").value.trim(),
       comms:[...ratings.comms], commsImprovement:document.getElementById("comms-improvement").value.trim(),
       suggestions:document.getElementById("suggestions").value.trim(),
+      commitmentFollowThrough:choiceAnswers.followthrough||"",
       commitment:document.getElementById("commitment").value.trim(),
       timestamp:new Date().toISOString()
     };
@@ -669,6 +724,8 @@
         if (json.status==="ok"&&json.rows&&json.rows.length>0) {
           const mapped = json.rows.map(r=>({
             morale:Number(r.Morale)||0,
+            progressSinceLast:r.Progress_SinceLast||r.progressSinceLast||"",
+            progressComment:r.Progress_Comment||r.progressComment||"",
             hq:[r.HQ_Direction,r.HQ_Support,r.HQ_Transparency,r.HQ_Recognition].map(Number),
             hqComment:r.HQ_Comment||"",
             dept:[r.Dept_Leadership,r.Dept_Availability,r.Dept_Fairness,r.Dept_Motivation].map(Number),
@@ -677,7 +734,9 @@
             bottleneck:r.Bottleneck||"",
             comms:[r.Comms_Updates,r.Comms_Openness,r.Comms_Clarity,r.Comms_Safety].map(Number),
             commsImprovement:r.Comms_Improvement||"",
-            suggestions:r.Suggestions||"", commitment:r.Commitment||""
+            suggestions:r.Suggestions||"",
+            commitmentFollowThrough:r.Commitment_FollowThrough||r.commitmentFollowThrough||"",
+            commitment:r.Commitment||""
           }));
           // Filter out ghost rows (morale must be 1-10 and at least one rating must be set)
           return mapped.filter(r => r.morale >= 1 && r.morale <= 10);
@@ -713,12 +772,13 @@
     document.getElementById("morale-chart").innerHTML=dist.map((c,i)=>`<div class="chart-row"><div class="bar-label">${i+1}</div><div class="bar-bg"><div class="bar-fill" style="width:${Math.round(c/mx*100)}%"></div></div><div class="bar-count">${c}</div></div>`).join("");
 
     const tg=[
+      {label:"🔄 What's changed since Spring / 春以降の変化",key:"progressComment"},
       {label:"💬 Comments on HQ / HQへのコメント",key:"hqComment"},
       {label:"💬 Comments on Dept Head / 部門長へのコメント",key:"deptComment"},
       {label:"🔧 Bottlenecks / ボトルネック",key:"bottleneck"},
       {label:"📣 Comms Improvement / コミュニケーション改善案",key:"commsImprovement"},
       {label:"💡 Suggestions / 提案",key:"suggestions"},
-      {label:"🍁 Personal Commitments / 個人のコミットメント",key:"commitment"}
+      {label:"🎐 Personal Commitments / 個人のコミットメント",key:"commitment"}
     ];
     const tq=[];
     document.getElementById("resp-container").innerHTML=tg.map((g,gi)=>{
