@@ -237,8 +237,22 @@
       <button class="insights-btn" id="insights-btn" onclick="runAnalysis()">&#x2728; Generate AI Insights / AI&#x5206;&#x6790;&#x3092;&#x751F;&#x6210;</button>
       <div id="insights-output"></div>
     </div>
-    <div style="text-align:center;margin-top:20px;">
+    <div style="text-align:center;margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
       <button class="btn btn-back" onclick="loadDashboard()" style="font-size:.82rem;padding:9px 20px;">🔄 Refresh Data / データ更新</button>
+      <button class="btn btn-back" onclick="confirmClear()" style="font-size:.82rem;padding:9px 20px;color:#c0392b;border-color:#e0a0a0;">🗑️ Clear All Data / 全データ削除</button>
+    </div>
+  </div>
+</div>
+
+<div class="clear-modal-overlay" id="clear-modal-overlay">
+  <div class="clear-modal">
+    <span class="warn-icon">⚠️</span>
+    <h3>Clear all responses?</h3>
+    <p>This permanently deletes all responses from this device <strong>and</strong> the connected Google Sheet. This cannot be undone.
+      <span class="jp-note">すべての回答が、このデバイスと接続されたGoogleシートから完全に削除されます。この操作は取り消せません。</span></p>
+    <div class="clear-modal-btns">
+      <button class="btn btn-back" onclick="document.getElementById('clear-modal-overlay').classList.remove('open')">Cancel / キャンセル</button>
+      <button class="btn btn-submit" style="background:#c0392b" onclick="clearAllData()">Yes, clear it / 削除する</button>
     </div>
   </div>
 </div>
@@ -494,7 +508,7 @@
 </div>
 
 <script>
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbxi0KEzfuD35hl84N1cLclQbrlL6i0ug9KDlb0AfjjADpDxb9uwx07P5trVKWj7I46q/exec";
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbx5wEIRrm-b1_nf_cpG1zfwjErKfula5F5AMsuRYOrtSF8f1J-Qsgir72bOf1RSq36E/exec";
   const ANTHROPIC_KEY = "YOUR_ANTHROPIC_API_KEY"; // replace to enable AI narrative
 
   const STEPS = 8;
@@ -721,7 +735,7 @@
         showLoading("Loading… / データ読込中…");
         const res=await fetch(SHEET_URL+"?action=get",{method:"GET"});
         const json=await res.json(); hideLoading();
-        if (json.status==="ok"&&json.rows&&json.rows.length>0) {
+        if (json.status==="ok"&&json.rows) {
           const mapped = json.rows.map(r=>({
             morale:Number(r.Morale)||0,
             progressSinceLast:r.Progress_SinceLast||r.progressSinceLast||"",
