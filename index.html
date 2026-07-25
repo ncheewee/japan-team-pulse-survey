@@ -3,45 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Japan Team Pulse Survey — Summer | 夏のチームパルスサーベイ</title>
+<title>Japan Team Pulse Survey — Autumn | 秋のチームパルスサーベイ</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --primary:        #e0913a;
-    --primary-dark:   #a8501f;
-    --primary-mid:    #eeab5c;
-    --primary-light:  #fdf0dc;
-    --secondary:      #7d97a8;
-    --secondary-dark: #2f4a5e;
-    --amber:          #eeab5c;
+    --primary:        #c1502e;
+    --primary-dark:   #7a2e17;
+    --primary-mid:    #d97e46;
+    --primary-light:  #fbe8d8;
+    --secondary:      #a68a5b;
+    --secondary-dark: #5a3d1f;
+    --amber:          #d97e46;
     --white:          #ffffff;
-    --off-white:      #fbf8f2;
+    --off-white:      #fdf8f2;
     --grey-text:      #5a5a5a;
     --dark-text:      #1c1c1c;
     --radius:         12px;
-    --shadow:         0 4px 24px rgba(24,58,84,.18);
+    --shadow:         0 4px 24px rgba(90,45,15,.2);
   }
   body {
     font-family: 'Helvetica Neue', 'Segoe UI', Arial, 'Hiragino Sans', sans-serif;
-    background: linear-gradient(160deg, #0f2942 0%, #16395a 55%, #1c4666 100%);
+    background: linear-gradient(160deg, #3b1f12 0%, #5c2e18 55%, #6e3a1e 100%);
     min-height: 100vh; color: var(--dark-text); overflow-x: hidden;
   }
   .petals { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; overflow:hidden; }
   .petal {
-    position: absolute; bottom:-20px;
-    width:6px; height:6px;
-    background: radial-gradient(circle, #fef3c7 0%, #f5d576 55%, rgba(245,213,118,0) 75%);
-    border-radius: 50%;
+    position: absolute; top:-40px;
+    width:12px; height:11px;
+    background: radial-gradient(ellipse at 40% 30%, #e8a35c 55%, #b8461f 100%);
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
     opacity: 0.7;
-    box-shadow: 0 0 6px 2px rgba(245,213,118,.6);
-    animation: rise linear infinite;
+    animation: fall linear infinite;
   }
-  @keyframes rise {
-    0%   { transform: translateY(0) translateX(0); opacity:0; }
-    10%  { opacity:.9; }
-    50%  { transform: translateY(-55vh) translateX(15px); opacity:.6; }
-    85%  { opacity:.3; }
-    100% { transform: translateY(-105vh) translateX(-10px); opacity:0; }
+  @keyframes fall {
+    0%   { transform: translateY(0) rotate(0deg) translateX(0); opacity:.8; }
+    30%  { transform: translateY(30vh) rotate(140deg) translateX(25px); opacity:.6; }
+    60%  { transform: translateY(65vh) rotate(280deg) translateX(-20px); opacity:.4; }
+    100% { transform: translateY(110vh) rotate(400deg) translateX(15px); opacity:0; }
   }
   .container { position:relative; z-index:1; max-width:720px; margin:0 auto; padding:32px 20px 60px; }
   .header { text-align:center; background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); padding:36px 28px 28px; margin-bottom:28px; }
@@ -190,7 +188,7 @@
 <div class="petals" id="petals"></div>
 <button id="admin-btn" onclick="openLogin()">&#x1F510; Admin</button>
 <div id="loading-screen">
-  <div class="loading-leaf">🏮</div>
+  <div class="loading-leaf">🍁</div>
   <div id="loading-msg">Submitting your response&hellip;</div>
 </div>
 <div id="login-overlay">
@@ -262,11 +260,11 @@
 
 <div class="container">
   <div class="header">
-    <span class="maple-icon">🏮</span>
-    <div style="display:inline-block;background:linear-gradient(135deg,#eeab5c,#a8501f);color:#fff;font-size:.72rem;font-weight:700;padding:4px 14px;border-radius:20px;letter-spacing:.08em;margin-bottom:10px;">🎆 SUMMER 2026 · ROUND 2 · 夏のサーベイ・第2回</div>
+    <span class="maple-icon">🍁</span>
+    <div style="display:inline-block;background:linear-gradient(135deg,#d97e46,#7a2e17);color:#fff;font-size:.72rem;font-weight:700;padding:4px 14px;border-radius:20px;letter-spacing:.08em;margin-bottom:10px;">🍂 AUTUMN 2026 · ROUND 3 · 秋のサーベイ・第3回</div>
     <h1>Japan PM/Procurement Team<span class="jp">日本 PM/調達チーム &mdash; チームパルスサーベイ</span></h1>
-    <p>Round two! Your honest feedback helps us grow together. This survey is <strong>completely anonymous</strong>.<br>
-    <span style="font-size:.85rem;color:#7a6c72">第2回です。正直なフィードバックが私たちの成長を助けます。このアンケートは<strong>完全に匿名</strong>です。</span></p>
+    <p>Round three, heading into Q4! Your honest feedback helps us grow together. This survey is <strong>completely anonymous</strong>.<br>
+    <span style="font-size:.85rem;color:#7a6c72">第3回、Q4に向けて。正直なフィードバックが私たちの成長を助けます。このアンケートは<strong>完全に匿名</strong>です。</span></p>
     <span class="anon-badge">🔒 Anonymous · 匿名</span>
   </div>
   <div class="progress-wrap">
@@ -287,7 +285,7 @@
     </div>
 
     <div class="followup-box">
-      <label class="field-label">🔄 Since the Spring survey, how do things feel? <span class="jp">春のサーベイ以降、状況はどう変わりましたか？</span></label>
+      <label class="field-label">🔄 Since the Summer survey, how do things feel? <span class="jp">夏のサーベイ以降、状況はどう変わりましたか？</span></label>
       <div class="choice-row" id="progress-choice">
         <div class="choice-btn" data-val="improved" onclick="selectChoice('progress-choice','progress',this)">📈 Improved<span class="jp-sm">改善した</span></div>
         <div class="choice-btn" data-val="same" onclick="selectChoice('progress-choice','progress',this)">➡️ About the same<span class="jp-sm">変わらない</span></div>
@@ -354,7 +352,7 @@
       <div class="rating-row"><div class="rating-label">Cross-team collaboration <span class="jp">&#x30C1;&#x30FC;&#x30E0;&#x9593;&#x306E;&#x5354;&#x529B;</span></div><div class="stars" data-group="process" data-idx="3"></div></div>
     </div>
     <div class="star-err" id="star-err-3">&#x26A0;&#xFE0F; Please rate all 4 items before continuing. / &#x6B21;&#x306B;&#x9032;&#x3080;&#x524D;&#x306B;4&#x9805;&#x76EE;&#x3059;&#x3079;&#x3066;&#x3092;&#x8A55;&#x4FA1;&#x3057;&#x3066;&#x304F;&#x3060;&#x3055;&#x3044;&#x3002;</div>
-    <label class="field-label">What's the biggest bottleneck? <span class="jp">&#x6700;&#x5927;&#x306E;&#x30DC;&#x30C8;&#x30EB;&#x30CD;&#x30C3;&#x30AF;&#x306F;&#x4F55;&#x3067;&#x3059;&#x304B;&#xFF1F;</span></label>
+    <label class="field-label">Heading into Q4 year-end close, what's your biggest concern? <span class="jp">第4四半期・年度末に向けて、最も気になることは何ですか？</span></label>
     <p class="field-hint">&#x1F4AC; Type in English or Japanese / &#x82F1;&#x8A9E;&#x307E;&#x305F;&#x306F;&#x65E5;&#x672C;&#x8A9E;&#x3067;&#x5165;&#x529B;&#x3067;&#x304D;&#x307E;&#x3059;</p>
     <textarea id="bottleneck" rows="3" placeholder="e.g. approval delays&hellip; / &#x4F8B;&#xFF1A;&#x627F;&#x8A8D;&#x306E;&#x9045;&#x5EF6;&hellip;" oninput="scheduleTranslation('bottleneck','bottleneck-trans')"></textarea>
     <div class="trans-preview" id="bottleneck-trans"></div>
@@ -401,10 +399,10 @@
 
   <!-- STEP 6: COMMITMENT -->
   <div class="card" id="step-6">
-    <div class="section-title">🎐 Your Personal Commitment <span class="jp">個人のコミットメント</span></div>
+    <div class="section-title">🍁 Your Personal Commitment <span class="jp">個人のコミットメント</span></div>
 
     <div class="followup-box">
-      <label class="field-label">✅ Did you follow through on your Spring commitment? <span class="jp">春に立てたコミットメントは実行できましたか？</span></label>
+      <label class="field-label">✅ Did you follow through on your Summer commitment? <span class="jp">夏に立てたコミットメントは実行できましたか？</span></label>
       <div class="choice-row" id="followthrough-choice">
         <div class="choice-btn" data-val="fully" onclick="selectChoice('followthrough-choice','followthrough',this)">✅ Fully<span class="jp-sm">完全に実行</span></div>
         <div class="choice-btn" data-val="partially" onclick="selectChoice('followthrough-choice','followthrough',this)">🔶 Partially<span class="jp-sm">一部実行</span></div>
@@ -435,7 +433,7 @@
     <div class="review-section">
       <div class="review-section-title">😊 Overall Morale / 全体的な士気</div>
       <div class="review-row"><span class="rv-label">Morale score / 士気スコア</span><span class="rv-val" id="rv-morale">—</span></div>
-      <div class="review-row"><span class="rv-label">Since Spring / 春以降</span><span class="rv-val" id="rv-progress">—</span></div>
+      <div class="review-row"><span class="rv-label">Since Summer / 夏以降</span><span class="rv-val" id="rv-progress">—</span></div>
       <div id="rv-progress-comment"></div>
     </div>
 
@@ -485,8 +483,8 @@
       <div id="rv-suggestions"></div>
     </div>
     <div class="review-section">
-      <div class="review-section-title">🎐 Personal Commitment / 個人のコミットメント</div>
-      <div class="review-row"><span class="rv-label">Followed through on Spring commitment? / 春のコミットメント達成度</span><span class="rv-val" id="rv-followthrough">—</span></div>
+      <div class="review-section-title">🍁 Personal Commitment / 個人のコミットメント</div>
+      <div class="review-row"><span class="rv-label">Followed through on Summer commitment? / 夏のコミットメント達成度</span><span class="rv-val" id="rv-followthrough">—</span></div>
       <div id="rv-commitment"></div>
     </div>
 
@@ -494,13 +492,13 @@
       <button class="btn btn-back" onclick="goBack()">&larr; Back / 戻る</button>
       <button class="btn btn-submit" onclick="submitForm()">
         <span class="submit-spinner" id="spinner">⟳</span>
-        Submit Survey 🎆 / 送信する
+        Submit Survey 🍁 / 送信する
       </button>
     </div>
   </div>
 
   <div id="thank-you" class="card">
-    <div class="ty-icon">🎆</div>
+    <div class="ty-icon">🍁</div>
     <h2>Thank you! <span class="jp">ありがとうございます！</span></h2>
     <p>Your feedback has been received anonymously and will help shape a better workplace for everyone.<br><br>
     <span style="color:#7a6c72;font-size:.85rem">あなたのフィードバックは匿名で受け取られ、全員にとってより良い職場づくりに役立てられます。</span></p>
@@ -511,7 +509,7 @@
   const SHEET_URL = "https://script.google.com/macros/s/AKfycbxi0KEzfuD35hl84N1cLclQbrlL6i0ug9KDlb0AfjjADpDxb9uwx07P5trVKWj7I46q/exec";
   // One value to change each round — the Apps Script auto-creates a tab named this in the same spreadsheet.
   // No new Sheet or new Apps Script deployment needed next quarter, just update this string.
-  const SURVEY_ROUND = "Summer 2026";
+  const SURVEY_ROUND = "Autumn 2026";
   const ANTHROPIC_KEY = "YOUR_ANTHROPIC_API_KEY"; // replace to enable AI narrative
 
   const STEPS = 8;
@@ -539,18 +537,18 @@
 
   function generateLeaves() {
     const w = document.getElementById("petals");
-    const colors = ["#fef3c7","#f5d576","#fcd34d","#fde68a"];
+    const colors = ["#e8a35c","#c1502e","#b8461f","#d97e46","#8a3a1a"];
     for (let i=0;i<28;i++) {
       const p = document.createElement("div"); p.className="petal";
-      const sz = 4 + Math.random()*5;
+      const sz = 9 + Math.random()*10;
       p.style.left=Math.random()*100+"%";
-      p.style.width=sz+"px"; p.style.height=sz+"px";
-      const c = colors[Math.floor(Math.random()*colors.length)];
-      p.style.background=`radial-gradient(circle, ${c} 0%, rgba(245,213,118,0) 75%)`;
-      p.style.boxShadow=`0 0 6px 2px ${c}99`;
-      p.style.animationDuration=(7+Math.random()*10)+"s";
+      p.style.width=sz+"px"; p.style.height=(sz*0.9)+"px";
+      const c1 = colors[Math.floor(Math.random()*colors.length)];
+      const c2 = colors[Math.floor(Math.random()*colors.length)];
+      p.style.background=`radial-gradient(ellipse at 40% 30%, ${c1} 55%, ${c2} 100%)`;
+      p.style.animationDuration=(6+Math.random()*9)+"s";
       p.style.animationDelay=(Math.random()*10)+"s";
-      p.style.opacity=0.4+Math.random()*0.5;
+      p.style.opacity=0.5+Math.random()*0.4;
       w.appendChild(p);
     }
   }
@@ -790,13 +788,13 @@
     document.getElementById("morale-chart").innerHTML=dist.map((c,i)=>`<div class="chart-row"><div class="bar-label">${i+1}</div><div class="bar-bg"><div class="bar-fill" style="width:${Math.round(c/mx*100)}%"></div></div><div class="bar-count">${c}</div></div>`).join("");
 
     const tg=[
-      {label:"🔄 What's changed since Spring / 春以降の変化",key:"progressComment"},
+      {label:"🔄 What's changed since Summer / 夏以降の変化",key:"progressComment"},
       {label:"💬 Comments on HQ / HQへのコメント",key:"hqComment"},
       {label:"💬 Comments on Dept Head / 部門長へのコメント",key:"deptComment"},
       {label:"🔧 Bottlenecks / ボトルネック",key:"bottleneck"},
       {label:"📣 Comms Improvement / コミュニケーション改善案",key:"commsImprovement"},
       {label:"💡 Suggestions / 提案",key:"suggestions"},
-      {label:"🎐 Personal Commitments / 個人のコミットメント",key:"commitment"}
+      {label:"🍁 Personal Commitments / 個人のコミットメント",key:"commitment"}
     ];
     const tq=[];
     document.getElementById("resp-container").innerHTML=tg.map((g,gi)=>{
