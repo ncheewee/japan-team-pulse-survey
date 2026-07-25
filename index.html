@@ -509,6 +509,9 @@
 
 <script>
   const SHEET_URL = "https://script.google.com/macros/s/AKfycbxi0KEzfuD35hl84N1cLclQbrlL6i0ug9KDlb0AfjjADpDxb9uwx07P5trVKWj7I46q/exec";
+  // One value to change each round — the Apps Script auto-creates a tab named this in the same spreadsheet.
+  // No new Sheet or new Apps Script deployment needed next quarter, just update this string.
+  const SURVEY_ROUND = "Summer 2026";
   const ANTHROPIC_KEY = "YOUR_ANTHROPIC_API_KEY"; // replace to enable AI narrative
 
   const STEPS = 8;
@@ -670,6 +673,7 @@
 
   async function submitForm() {
     const p={
+      round:SURVEY_ROUND,
       season:"summer",
       morale:parseInt(document.getElementById("morale-slider").value),
       progressSinceLast:choiceAnswers.progress||"", progressComment:document.getElementById("progress-comment").value.trim(),
@@ -719,7 +723,7 @@
           method: "POST",
           mode: "no-cors",
           headers: {"Content-Type":"application/json"},
-          body: JSON.stringify({action:"clear"})
+          body: JSON.stringify({action:"clear", round:SURVEY_ROUND})
         });
         // Allow Apps Script time to finish deleting rows before re-fetch
         await new Promise(r => setTimeout(r, 2500));
@@ -733,7 +737,7 @@
     if (SHEET_URL) {
       try {
         showLoading("Loading… / データ読込中…");
-        const res=await fetch(SHEET_URL+"?action=get",{method:"GET"});
+        const res=await fetch(SHEET_URL+"?action=get&round="+encodeURIComponent(SURVEY_ROUND),{method:"GET"});
         const json=await res.json(); hideLoading();
         if (json.status==="ok"&&json.rows) {
           const mapped = json.rows.map(r=>({
