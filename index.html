@@ -825,57 +825,78 @@
         return `<div class="resp-item"><div>${escapeHtml(t)}</div><div class="trans-preview admin-trans" id="${tid}" style="display:block;color:#bbb">⟳ translating…</div></div>`;
       }).join("")}</div>`;
     }).join("");
-    tq.forEach((item,i)=>setTimeout(()=>adminTranslate(item.text,item.id),i*320));
-  }
-
-  async function adminTranslate(text,elId) {
-    const el=document.getElementById(elId); if(!el) return;
-    const lang=detectLang(text), toLang=lang==='ja'?'en':'ja';
-    const flag=toLang==='ja'?'🇯🇵':'🇬🇧';
-    const result=await translateText(text,lang,toLang);
-    if (result&&result.toLowerCase()!==text.toLowerCase()) { el.textContent=flag+' '+result; el.style.color=""; }
-    else { el.style.display='none'; }
+    hydrateAdminTranslations(tq);
   }
 
   function escapeHtml(s) { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 
   const _tt={};
   function detectLang(t) { return /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\uFF65-\uFF9F]/.test(t)?'ja':'en'; }
-  // MyMemory's free tier rejects queries over 500 chars ("QUERY LENGTH LIMIT EXCEEDED").
-  // Split long text into safe chunks on sentence/line/word boundaries, translate each, and rejoin.
-  function chunkTextForTranslation(text, maxLen) {
-    maxLen = maxLen || 450;
-    if (text.length <= maxLen) return [text];
-    const chunks = [];
-    let remaining = text;
-    while (remaining.length > maxLen) {
-      const slice = remaining.slice(0, maxLen);
-      let breakAt = Math.max(
-        slice.lastIndexOf('\n'), slice.lastIndexOf('\u3002'), slice.lastIndexOf('\uFF01'), slice.lastIndexOf('\uFF1F'),
-        slice.lastIndexOf('. '), slice.lastIndexOf('! '), slice.lastIndexOf('? '), slice.lastIndexOf(' ')
-      );
-      if (breakAt < maxLen * 0.4) breakAt = maxLen; // no good break point nearby \u2014 hard cut
-      else breakAt += 1;
-      const piece = remaining.slice(0, breakAt).trim();
-      if (piece) chunks.push(piece);
-      remaining = remaining.slice(breakAt);
-    }
-    const last = remaining.trim();
-    if (last) chunks.push(last);
-    return chunks;
-  }
-  async function translateText(text,from,to) {
-    const chunks = chunkTextForTranslation(text, 450);
-    try {
-      const results = [];
-      for (const chunk of chunks) {
-        const r=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(chunk)}&langpair=${from}|${to}`);
-        const d=await r.json();
-        results.push(d.responseData?.translatedText || chunk);
+  // Translation runs server-side (Apps Script + Gemini) with a sheet-backed cache.
+  // Replaces the old MyMemory free-tier call, which had a 500-char query limit, a daily
+  // quota, and — worst of all — returned its quota warning as if it were translated text.
+  async function apiJson(url, tries) {
+    tries = tries || 2;
+    for (let i = 0; i < tries; i++) {
+      try {
+        const r = await fetch(url, { method: "GET" });
+        const txt = await r.text();
+        // Apps Script occasionally serves an HTML error page through its redirect chain.
+        // Never render that as content — treat it as a failure and retry once.
+        if (txt.trim().charAt(0) !== "{") throw new Error("non-JSON response");
+        return JSON.parse(txt);
+      } catch (e) {
+        if (i === tries - 1) return null;
+        await new Promise(res => setTimeout(res, 900));
       }
-      return results.join(chunks.length>1 ? ' ' : '');
-    } catch(e){return null;}
+    }
+    return null;
   }
+
+  async function translateText(text, from, to) {
+    const url = SHEET_URL + "?action=translate_text&text=" + encodeURIComponent(text) +
+                (to ? "&to=" + encodeURIComponent(to) : "");
+    const d = await apiJson(url);
+    if (!d || d.status !== "ok" || !d.translation) return null;
+    return d.translation;
+  }
+
+  // Admin dashboard: ONE bulk call translates every stored response for this round.
+  // Previously this fired a separate request per response (~70 per report load).
+  async function hydrateAdminTranslations(queue) {
+    if (!queue.length) return;
+    const d = await apiJson(SHEET_URL + "?action=translate&round=" + encodeURIComponent(SURVEY_ROUND));
+    const map = {};
+    if (d && d.status === "ok" && d.items) {
+      d.items.forEach(it => { if (it && it.translation) map[String(it.source).trim()] = it; });
+    }
+    const missing = [];
+    queue.forEach(item => {
+      const el = document.getElementById(item.id);
+      if (!el) return;
+      const hit = map[item.text.trim()];
+      if (hit) {
+        el.textContent = (hit.targetLang === "ja" ? "\u{1F1EF}\u{1F1F5} " : "\u{1F1EC}\u{1F1E7} ") + hit.translation;
+        el.style.color = "";
+      } else {
+        missing.push(item);
+      }
+    });
+    // Anything the bulk pass missed is retried individually, then reported honestly.
+    for (const item of missing) {
+      const el = document.getElementById(item.id);
+      if (!el) continue;
+      const result = await translateText(item.text);
+      if (result && result.toLowerCase() !== item.text.toLowerCase()) {
+        el.textContent = (detectLang(item.text) === "ja" ? "\u{1F1EC}\u{1F1E7} " : "\u{1F1EF}\u{1F1F5} ") + result;
+        el.style.color = "";
+      } else {
+        el.textContent = "\u2014 translation unavailable \u2014";
+        el.style.color = "#c0392b";
+      }
+    }
+  }
+
   function scheduleTranslation(tid,pid) {
     clearTimeout(_tt[tid]);
     const preview=document.getElementById(pid), text=document.getElementById(tid).value.trim();
