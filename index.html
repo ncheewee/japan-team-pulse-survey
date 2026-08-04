@@ -946,10 +946,9 @@
     // Falls back to the rule-based analysis above if no key is configured or the call fails.
     if (SHEET_URL) {
       try {
-        // Note: deliberately NOT setting Content-Type: application/json here — that triggers a CORS
-        // preflight (OPTIONS) that Apps Script web apps don't handle, which would break reading the response.
-        // text/plain keeps this a "simple request"; Apps Script parses e.postData.contents as JSON regardless.
-        const resp=await fetch(SHEET_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"insights", round:SURVEY_ROUND})});
+        // Uses GET, not POST — Apps Script POST responses have proven unreliable to read back
+        // in the browser through its redirect chain, while GET has been consistently solid.
+        const resp=await fetch(SHEET_URL+"?action=insights&round="+encodeURIComponent(SURVEY_ROUND),{method:"GET"});
         const d=await resp.json();
         if (d.status==="ok"&&d.insight) { out.textContent=d.insight; }
         else { out.textContent=generateRuleBasedAnalysis(sum); if(d.message) console.warn("Insights:",d.message); }
@@ -1006,7 +1005,7 @@
     const btn = document.getElementById("trend-insights-btn"), out = document.getElementById("trend-insights-output");
     btn.disabled = true; btn.textContent = "⟳ Analysing… / 分析中…"; out.style.display = "none";
     try {
-      const resp = await fetch(SHEET_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"trend_insights"})});
+      const resp = await fetch(SHEET_URL+"?action=trend_insights",{method:"GET"});
       const d = await resp.json();
       if (d.status==="ok"&&d.insight) { out.textContent=d.insight; }
       else { out.textContent = (d.message||"Could not generate trend insights. Make sure an Anthropic API key is set in the Apps Script's Script Properties."); }
