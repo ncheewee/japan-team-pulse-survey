@@ -194,6 +194,48 @@
   .review-text { background:var(--off-white); border-left:3px solid var(--primary-mid); border-radius:0 8px 8px 0; padding:8px 12px; font-size:.84rem; color:var(--grey-text); line-height:1.5; margin-top:4px; font-style:italic; }
   .review-empty { color:#bbb; font-size:.8rem; font-style:italic; }
   @media (max-width:520px) { .container{padding:20px 14px 50px} .card,.header{padding:22px 18px} #admin-panel{padding:24px 18px} .kpi-grid{grid-template-columns:repeat(2,1fr)} }
+  /* ---------- PDF report (rendered off-screen, then rasterised to PDF) ---------- */
+  #pdf-stage { position:fixed; left:-10000px; top:0; width:794px; background:#fff; z-index:-1; }
+  .pdf-report { width:794px; background:#fff; color:#1c1c1c; font-family:'Helvetica Neue',Helvetica,Arial,'Hiragino Sans','Yu Gothic',sans-serif; }
+  .pdf-block { padding:0 48px; box-sizing:border-box; width:794px; background:#fff; }
+  .pdf-cover { padding:70px 48px 40px; border-bottom:4px solid var(--primary); }
+  .pdf-cover h1 { font-size:30px; line-height:1.25; color:var(--primary-dark); font-weight:700; margin-bottom:6px; }
+  .pdf-cover .jp { font-size:17px; color:#5a5a5a; font-weight:500; margin-bottom:22px; }
+  .pdf-cover .meta { font-size:12.5px; color:#5a5a5a; line-height:1.9; }
+  .pdf-parttitle { padding:34px 48px 14px; }
+  .pdf-parttitle .kicker { font-size:11px; letter-spacing:2.4px; text-transform:uppercase; color:var(--primary); font-weight:700; }
+  .pdf-parttitle h2 { font-size:22px; color:#1c1c1c; font-weight:700; margin-top:4px; }
+  .pdf-parttitle .jp { font-size:13px; color:#6a6a6a; margin-top:2px; }
+  .pdf-kpis { display:flex; flex-wrap:wrap; gap:10px; padding:10px 48px 6px; }
+  .pdf-kpi { flex:1 1 120px; border:1px solid #e6e0d8; border-radius:10px; padding:12px 14px; background:#fdfbf8; }
+  .pdf-kpi .lbl { font-size:10.5px; letter-spacing:.6px; text-transform:uppercase; color:#8a8a8a; font-weight:600; }
+  .pdf-kpi .val { font-size:23px; font-weight:700; color:var(--primary-dark); margin-top:3px; }
+  .pdf-kpi .sub { font-size:10px; color:#9a9a9a; }
+  .pdf-h3 { font-size:15px; font-weight:700; color:var(--primary-dark); margin:18px 0 8px; }
+  .pdf-h4 { font-size:13px; font-weight:700; color:#1c1c1c; margin:14px 0 6px; }
+  .pdf-p { font-size:12px; line-height:1.72; color:#2e2e2e; margin:0 0 8px; }
+  .pdf-li { font-size:12px; line-height:1.65; color:#2e2e2e; margin:0 0 5px; padding-left:15px; position:relative; }
+  .pdf-li:before { content:"•"; position:absolute; left:2px; color:var(--primary); font-weight:700; }
+  .pdf-hr { height:1px; background:#eee6dc; margin:14px 0; }
+  .pdf-table { width:100%; border-collapse:collapse; font-size:11px; margin:6px 0 4px; }
+  .pdf-table th { background:var(--primary); color:#fff; padding:7px 8px; text-align:left; font-weight:600; font-size:10.5px; }
+  .pdf-table td { padding:7px 8px; border-bottom:1px solid #eee6dc; color:#2e2e2e; }
+  .pdf-table tr:nth-child(even) td { background:#fdfbf8; }
+  .pdf-up { color:#1e8449; font-weight:700; }
+  .pdf-down { color:#c0392b; font-weight:700; }
+  .pdf-flat { color:#9a9a9a; }
+  .pdf-qgroup { font-size:13px; font-weight:700; color:#fff; background:var(--secondary-dark); padding:8px 12px; border-radius:8px; margin:16px 0 10px; }
+  .pdf-resp { border:1px solid #e6e0d8; border-left:3px solid var(--primary); border-radius:8px; padding:11px 13px; margin-bottom:9px; background:#fff; }
+  .pdf-resp .src { font-size:11.5px; line-height:1.65; color:#1c1c1c; }
+  .pdf-resp .trn { font-size:11px; line-height:1.6; color:#6a6a6a; margin-top:6px; padding-top:6px; border-top:1px dashed #e6e0d8; }
+  .pdf-resp .rid { font-size:9.5px; color:#a89a8a; font-weight:600; letter-spacing:.5px; margin-bottom:5px; }
+  .pdf-foot { padding:16px 48px 40px; font-size:10px; color:#a0a0a0; }
+  .pdf-bars { padding:4px 0 2px; }
+  .pdf-bar-row { display:flex; align-items:center; gap:8px; margin-bottom:4px; font-size:10.5px; }
+  .pdf-bar-lbl { width:18px; color:#6a6a6a; text-align:right; }
+  .pdf-bar-bg { flex:1; height:13px; background:#f1ece5; border-radius:7px; overflow:hidden; }
+  .pdf-bar-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary-mid)); }
+  .pdf-bar-num { width:20px; color:#6a6a6a; }
 </style>
 </head>
 <body>
@@ -257,6 +299,7 @@
     </div>
 
     <div style="text-align:center;margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-back" id="pdf-btn" onclick="exportPdfReport()" style="font-size:.82rem;padding:9px 20px;">📄 Export PDF Report / PDFレポートを出力</button>
       <button class="btn btn-back" onclick="loadDashboard()" style="font-size:.82rem;padding:9px 20px;">🔄 Refresh Data / データ更新</button>
       <button class="btn btn-back" onclick="confirmClear()" style="font-size:.82rem;padding:9px 20px;color:#c0392b;border-color:#e0a0a0;">🗑️ Clear All Data / 全データ削除</button>
     </div>
@@ -1033,6 +1076,305 @@
     } catch(e) { console.warn(e); out.textContent = "Could not reach the backend."; }
     out.style.display = "block"; btn.disabled = false; btn.innerHTML = "✨ Generate Trend Insights / トレンド分析を生成";
   }
+
+  /* ================= PDF REPORT EXPORT =================
+     Part 1  — insights from the current round
+     Part 2  — cross-round trends + trend narrative
+     Annex   — raw responses (original + translation)
+
+     jsPDF and html2canvas are loaded on demand, only when Export is clicked, so the
+     survey form itself stays dependency-free for respondents.
+  ==================================================== */
+
+  const PDF_LIBS = [
+    "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+  ];
+
+  function loadScriptOnce(src) {
+    return new Promise((resolve, reject) => {
+      if (document.querySelector('script[data-pdflib="' + src + '"]')) return resolve();
+      const s = document.createElement("script");
+      s.src = src; s.async = true;
+      s.setAttribute("data-pdflib", src);
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error("Could not load " + src));
+      document.head.appendChild(s);
+    });
+  }
+
+  // Minimal markdown renderer for the AI narratives (headings, bold, bullets, rules).
+  function mdToHtml(md) {
+    const esc = s => escapeHtml(s);
+    const inline = s => esc(s)
+      .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+      .replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>");
+    const out = [];
+    String(md || "").split(/\r?\n/).forEach(raw => {
+      const line = raw.trim();
+      if (!line) return;
+      if (/^-{3,}$/.test(line) || /^_{3,}$/.test(line)) { out.push('<div class="pdf-hr"></div>'); return; }
+      let m;
+      if ((m = line.match(/^#{4,}\s*(.*)$/))) { out.push('<div class="pdf-h4">' + inline(m[1]) + "</div>"); return; }
+      if ((m = line.match(/^###\s*(.*)$/)))   { out.push('<div class="pdf-h3">' + inline(m[1]) + "</div>"); return; }
+      if ((m = line.match(/^##\s*(.*)$/)))    { out.push('<div class="pdf-h3">' + inline(m[1]) + "</div>"); return; }
+      if ((m = line.match(/^#\s*(.*)$/)))     { out.push('<div class="pdf-h3">' + inline(m[1]) + "</div>"); return; }
+      if ((m = line.match(/^[*\-•]\s+(.*)$/))) { out.push('<div class="pdf-li">' + inline(m[1]) + "</div>"); return; }
+      out.push('<div class="pdf-p">' + inline(line) + "</div>");
+    });
+    return out.join("");
+  }
+
+  function pdfBlock(inner, extraClass) {
+    return '<div class="pdf-block ' + (extraClass || "") + '">' + inner + "</div>";
+  }
+
+  // Split rendered markdown into page-friendly blocks, breaking at headings.
+  function mdToBlocks(md) {
+    const html = mdToHtml(md);
+    const parts = html.split(/(?=<div class="pdf-h3">)/g).filter(Boolean);
+    return parts.map(p => pdfBlock(p)).join("");
+  }
+
+  async function buildReportHtml() {
+    const rows = await fetchResponses();
+    if (!rows.length) throw new Error("No responses in this round yet.");
+
+    const avg = arr => arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1) : "N/A";
+    const avgR = (rs, k) => avg(rs.flatMap(r => r[k].filter(v => v > 0)));
+    const kpi = (lbl, val, sub) =>
+      '<div class="pdf-kpi"><div class="lbl">' + lbl + '</div><div class="val">' + val + '</div><div class="sub">' + (sub || "") + "</div></div>";
+
+    const now = new Date();
+    const stamp = now.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
+
+    let html = '<div class="pdf-report">';
+
+    // ---- Cover ----
+    html += '<div class="pdf-block pdf-cover">' +
+      "<h1>Japan Team Pulse Survey<br>" + escapeHtml(SURVEY_ROUND) + "</h1>" +
+      '<div class="jp">日本チーム パルスサーベイ — 報告書</div>' +
+      '<div class="meta"><strong>Responses / 回答数:</strong> ' + rows.length + "<br>" +
+      "<strong>Generated / 作成日:</strong> " + stamp + "<br>" +
+      "<strong>Confidential</strong> — for internal management use only</div></div>";
+
+    // ---- Part 1 ----
+    html += '<div class="pdf-block pdf-parttitle"><div class="kicker">Part 1</div>' +
+      "<h2>Insights — " + escapeHtml(SURVEY_ROUND) + "</h2>" +
+      '<div class="jp">今回の調査からの分析</div></div>';
+
+    html += '<div class="pdf-block"><div class="pdf-kpis" style="padding-left:0;padding-right:0;">' +
+      kpi("Morale", avg(rows.map(r => r.morale)), "out of 10") +
+      kpi("HQ (GPM)", avgR(rows, "hq"), "out of 5") +
+      kpi("Dept Head", avgR(rows, "dept"), "out of 5") +
+      kpi("Processes", avgR(rows, "process"), "out of 5") +
+      kpi("Comms", avgR(rows, "comms"), "out of 5") +
+      "</div></div>";
+
+    const dist = Array(10).fill(0);
+    rows.forEach(r => { if (r.morale >= 1 && r.morale <= 10) dist[r.morale - 1]++; });
+    const mx = Math.max.apply(null, dist.concat([1]));
+    let bars = '<div class="pdf-h3">Morale distribution / モラール分布</div><div class="pdf-bars">';
+    dist.forEach((c, i) => {
+      bars += '<div class="pdf-bar-row"><div class="pdf-bar-lbl">' + (i + 1) + '</div>' +
+        '<div class="pdf-bar-bg"><div class="pdf-bar-fill" style="width:' + Math.round(c / mx * 100) + '%"></div></div>' +
+        '<div class="pdf-bar-num">' + c + "</div></div>";
+    });
+    bars += "</div>";
+    html += pdfBlock(bars);
+
+    // AI insight — reuse what's on screen, otherwise fetch it now.
+    let insight = (document.getElementById("insights-output") || {}).textContent || "";
+    if (!insight.trim()) {
+      const d = await apiJson(SHEET_URL + "?action=insights&round=" + encodeURIComponent(SURVEY_ROUND));
+      insight = (d && d.status === "ok" && d.insight) ? d.insight : "AI insights unavailable at time of export.";
+    }
+    html += pdfBlock('<div class="pdf-h3">AI analysis / AI分析</div>');
+    html += mdToBlocks(insight);
+
+    // ---- Part 2 ----
+    html += '<div class="pdf-block pdf-parttitle"><div class="kicker">Part 2</div>' +
+      "<h2>Trends Across Rounds</h2>" +
+      '<div class="jp">ラウンド間の推移と分析</div></div>';
+
+    let rounds = _lastTrendRounds;
+    if (!rounds || !rounds.length) {
+      const rj = await apiJson(SHEET_URL + "?action=rounds");
+      rounds = (rj && rj.status === "ok" && rj.rounds) ? rj.rounds : [];
+      rounds = rounds.slice().sort((a, b) => new Date(a.firstTimestamp || 0) - new Date(b.firstTimestamp || 0));
+    }
+
+    if (rounds.length) {
+      const metric = v => (v === null || v === undefined || v === "") ? "—" : Number(v).toFixed(1);
+      const arrow = (curr, prev) => {
+        if (prev === null || prev === undefined || curr === null || curr === undefined) return "";
+        const d = Number(curr) - Number(prev);
+        if (Math.abs(d) < 0.05) return ' <span class="pdf-flat">→</span>';
+        return d > 0 ? ' <span class="pdf-up">▲ ' + d.toFixed(1) + "</span>"
+                     : ' <span class="pdf-down">▼ ' + Math.abs(d).toFixed(1) + "</span>";
+      };
+      let t = '<table class="pdf-table"><thead><tr><th>Round</th><th>N</th><th>Morale</th><th>HQ</th><th>Dept</th><th>Process</th><th>Comms</th></tr></thead><tbody>';
+      rounds.forEach((r, i) => {
+        const prev = i > 0 ? rounds[i - 1] : null;
+        t += "<tr><td>" + escapeHtml(r.round) + "</td><td>" + r.count + "</td>";
+        ["avgMorale", "avgHQ", "avgDept", "avgProcess", "avgComms"].forEach(k => {
+          t += "<td>" + metric(r[k]) + (prev ? arrow(r[k], prev[k]) : "") + "</td>";
+        });
+        t += "</tr>";
+      });
+      t += "</tbody></table>";
+      html += pdfBlock('<div class="pdf-h3">Round-on-round metrics</div>' + t);
+    }
+
+    let trendText = (document.getElementById("trend-insights-output") || {}).textContent || "";
+    if (!trendText.trim() && rounds.length >= 2) {
+      const d2 = await apiJson(SHEET_URL + "?action=trend_insights");
+      trendText = (d2 && d2.status === "ok" && d2.insight) ? d2.insight : "";
+    }
+    if (trendText.trim()) {
+      html += pdfBlock('<div class="pdf-h3">Trend analysis / トレンド分析</div>');
+      html += mdToBlocks(trendText);
+    } else {
+      html += pdfBlock('<div class="pdf-p">Not enough rounds with data to produce a trend narrative.</div>');
+    }
+
+    // ---- Annex ----
+    html += '<div class="pdf-block pdf-parttitle"><div class="kicker">Annex</div>' +
+      "<h2>Raw Responses — " + escapeHtml(SURVEY_ROUND) + "</h2>" +
+      '<div class="jp">回答原文（翻訳付き）</div></div>';
+
+    // Pull the cached translations so the annex is bilingual.
+    const tmap = {};
+    const td = await apiJson(SHEET_URL + "?action=translate&round=" + encodeURIComponent(SURVEY_ROUND));
+    if (td && td.status === "ok" && td.items) {
+      td.items.forEach(it => { if (it && it.translation) tmap[String(it.source).trim()] = it.translation; });
+    }
+
+    const groups = [
+      { label: "🔄 What's changed since last round / 前回からの変化", key: "progressComment" },
+      { label: "💬 Comments on HQ / HQへのコメント", key: "hqComment" },
+      { label: "💬 Comments on Dept Head / 部門長へのコメント", key: "deptComment" },
+      { label: "🔧 Bottlenecks / ボトルネック", key: "bottleneck" },
+      { label: "📣 Comms improvement / コミュニケーション改善案", key: "commsImprovement" },
+      { label: "💡 Suggestions / 提案", key: "suggestions" },
+      { label: "🎐 Personal commitments / 個人のコミットメント", key: "commitment" }
+    ];
+
+    groups.forEach(g => {
+      const items = rows.map(r => r[g.key]).filter(t => t && String(t).trim());
+      if (!items.length) return;
+      html += pdfBlock('<div class="pdf-qgroup">' + g.label + " · " + items.length + "</div>");
+      items.forEach((txt, i) => {
+        const src = String(txt).trim();
+        const tr = tmap[src];
+        html += pdfBlock('<div class="pdf-resp"><div class="rid">RESPONSE ' + (i + 1) + "</div>" +
+          '<div class="src">' + escapeHtml(src).replace(/\n/g, "<br>") + "</div>" +
+          (tr ? '<div class="trn">' + escapeHtml(tr).replace(/\n/g, "<br>") + "</div>" : "") +
+          "</div>");
+      });
+    });
+
+    html += '<div class="pdf-block pdf-foot">Japan Team Pulse Survey — ' + escapeHtml(SURVEY_ROUND) +
+      " · generated " + stamp + " · confidential</div>";
+    html += "</div>";
+    return html;
+  }
+
+  async function exportPdfReport() {
+    const btn = document.getElementById("pdf-btn");
+    const orig = btn ? btn.innerHTML : "";
+    const setLbl = t => { if (btn) { btn.disabled = true; btn.textContent = t; } };
+    try {
+      setLbl("⟳ Loading…");
+      await Promise.all(PDF_LIBS.map(loadScriptOnce));
+      const jsPDFCtor = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+      if (!jsPDFCtor || !window.html2canvas) throw new Error("PDF libraries failed to load.");
+
+      setLbl("⟳ Gathering…");
+      const html = await buildReportHtml();
+
+      let stage = document.getElementById("pdf-stage");
+      if (!stage) { stage = document.createElement("div"); stage.id = "pdf-stage"; document.body.appendChild(stage); }
+      stage.innerHTML = html;
+
+      setLbl("⟳ Rendering…");
+      const pdf = new jsPDFCtor({ unit: "mm", format: "a4", orientation: "portrait" });
+      const pageW = 210, pageH = 297, margin = 12;
+      const contentW = pageW - margin * 2;
+      let cursor = margin;
+      let firstPage = true;
+
+      const blocks = Array.prototype.slice.call(stage.querySelectorAll(".pdf-block"));
+      for (let i = 0; i < blocks.length; i++) {
+        const canvas = await window.html2canvas(blocks[i], { scale: 2, backgroundColor: "#ffffff", logging: false, useCORS: true });
+        if (!canvas.width || !canvas.height) continue;
+        const hMm = (canvas.height / canvas.width) * contentW;
+        const img = canvas.toDataURL("image/jpeg", 0.92);
+
+        if (hMm > pageH - margin * 2) {
+          // Block taller than a page — slice it across pages.
+          const pxPerMm = canvas.width / contentW;
+          const sliceHpx = Math.floor((pageH - margin * 2) * pxPerMm);
+          let y = 0;
+          while (y < canvas.height) {
+            const h = Math.min(sliceHpx, canvas.height - y);
+            const c2 = document.createElement("canvas");
+            c2.width = canvas.width; c2.height = h;
+            c2.getContext("2d").drawImage(canvas, 0, y, canvas.width, h, 0, 0, canvas.width, h);
+            if (!firstPage) pdf.addPage(); firstPage = false;
+            pdf.addImage(c2.toDataURL("image/jpeg", 0.92), "JPEG", margin, margin, contentW, h / pxPerMm);
+            cursor = margin + h / pxPerMm;
+            y += h;
+          }
+          continue;
+        }
+
+        if (!firstPage && cursor + hMm > pageH - margin) { pdf.addPage(); cursor = margin; }
+        if (firstPage) { cursor = margin; firstPage = false; }
+        pdf.addImage(img, "JPEG", margin, cursor, contentW, hMm);
+        cursor += hMm;
+      }
+
+      // Page numbers
+      const total = pdf.internal.getNumberOfPages();
+      for (let p = 1; p <= total; p++) {
+        pdf.setPage(p);
+        pdf.setFontSize(8); pdf.setTextColor(150);
+        pdf.text(String(p) + " / " + String(total), pageW - margin, pageH - 6, { align: "right" });
+      }
+
+      stage.innerHTML = "";
+      const blob = pdf.output("blob");
+      const fname = "Japan-Pulse-Survey-" + SURVEY_ROUND.replace(/\s+/g, "-") + "-Report-" +
+        new Date().toISOString().slice(0, 10) + ".pdf";
+
+      setLbl("⟳ Saving…");
+      if (window.showSaveFilePicker) {
+        try {
+          const handle = await window.showSaveFilePicker({
+            suggestedName: fname,
+            types: [{ description: "PDF document", accept: { "application/pdf": [".pdf"] } }]
+          });
+          const w = await handle.createWritable();
+          await w.write(blob); await w.close();
+        } catch (err) {
+          if (err && err.name === "AbortError") { if (btn) { btn.disabled = false; btn.innerHTML = orig; } return; }
+          throw err;
+        }
+      } else {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob); a.download = fname;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      }
+    } catch (e) {
+      console.warn(e);
+      alert("Could not generate the PDF report.\n\n" + (e && e.message ? e.message : e));
+    } finally {
+      if (btn) { btn.disabled = false; btn.innerHTML = orig; }
+    }
+  }
+
 </script>
 </body>
 </html>
