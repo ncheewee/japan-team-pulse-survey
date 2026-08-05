@@ -1080,26 +1080,11 @@
      Part 2  — cross-round trends + trend narrative
      Annex   — raw responses (original + translation)
 
-     jsPDF and html2canvas are loaded on demand, only when Export is clicked, so the
-     survey form itself stays dependency-free for respondents.
+     Rendered through the browser's own print engine rather than a canvas raster.
+     That keeps the text selectable and searchable, renders Japanese correctly
+     without embedding a font, produces a file around 200KB instead of 5MB, and
+     needs no third-party libraries at all.
   ==================================================== */
-
-  const PDF_LIBS = [
-    "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
-    "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
-  ];
-
-  function loadScriptOnce(src) {
-    return new Promise((resolve, reject) => {
-      if (document.querySelector('script[data-pdflib="' + src + '"]')) return resolve();
-      const s = document.createElement("script");
-      s.src = src; s.async = true;
-      s.setAttribute("data-pdflib", src);
-      s.onload = () => resolve();
-      s.onerror = () => reject(new Error("Could not load " + src));
-      document.head.appendChild(s);
-    });
-  }
 
   // Minimal markdown renderer for the AI narratives (headings, bold, bullets, rules).
   function mdToHtml(md) {
@@ -1278,95 +1263,91 @@
     return html;
   }
 
+  // Pull the .pdf-* rules out of the page's own stylesheet, so the print document
+  // stays in sync with the on-screen styles without duplicating them here.
+  function collectReportCss() {
+    let out = "";
+    const sheets = Array.prototype.slice.call(document.styleSheets);
+    for (const sheet of sheets) {
+      let rules;
+      try { rules = sheet.cssRules; } catch (e) { continue; }
+      for (const r of Array.prototype.slice.call(rules || [])) {
+        const t = r.cssText || "";
+        if (t.indexOf(".pdf-") === 0) out += t + "\n";
+      }
+    }
+    return out;
+  }
+
+  // Those rules reference CSS custom properties declared on :root of the app, which
+  // do not exist in the print window — resolve them to literal values first.
+  function collectRootVars() {
+    const cs = getComputedStyle(document.documentElement);
+    const names = ["--primary", "--primary-dark", "--primary-mid", "--primary-light",
+                   "--secondary", "--secondary-dark", "--amber", "--white", "--off-white",
+                   "--grey-text", "--dark-text"];
+    return ":root{" + names.map(n => n + ":" + cs.getPropertyValue(n).trim() + ";").join("") + "}";
+  }
+
+  const PRINT_CSS = [
+    "@page { size: A4; margin: 14mm 12mm; }",
+    "html, body { margin:0; padding:0; background:#fff; }",
+    "body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }",
+    ".pdf-report { width:auto; }",
+    ".pdf-block { width:auto; padding:0; }",
+    ".pdf-cover { padding:0 0 26px; }",
+    ".pdf-parttitle { padding:0 0 10px; break-before:page; page-break-before:always; }",
+    ".pdf-kpis { padding:6px 0; }",
+    ".pdf-foot { padding:18px 0 0; }",
+    // Never split a response card, a KPI tile or a table row across a page.
+    ".pdf-resp, .pdf-kpi, .pdf-qgroup, .pdf-bar-row { break-inside:avoid; page-break-inside:avoid; }",
+    ".pdf-table tr { break-inside:avoid; page-break-inside:avoid; }",
+    // A heading should never be the last thing on a page.
+    ".pdf-h3, .pdf-h4, .pdf-qgroup { break-after:avoid; page-break-after:avoid; }",
+    ".pdf-kpis { gap:8px; flex-wrap:nowrap; }",
+    ".pdf-kpi { flex:1 1 0; min-width:0; padding:10px 9px; }",
+    ".pdf-kpi .lbl { font-size:9px; letter-spacing:.3px; }",
+    ".pdf-kpi .val { font-size:20px; }",
+    "@media screen { body { padding:26px; background:#f4f1ec; } .pdf-report { max-width:780px; margin:0 auto; background:#fff; padding:30px; box-shadow:0 2px 18px rgba(0,0,0,.12); } }"
+  ].join("\n");
+
   async function exportPdfReport() {
     const btn = document.getElementById("pdf-btn");
     const orig = btn ? btn.innerHTML : "";
     const setLbl = t => { if (btn) { btn.disabled = true; btn.textContent = t; } };
+
+    // Open the window immediately, while the click is still a live user gesture.
+    // Anything opened after an await is blocked — that is exactly what broke the
+    // previous showSaveFilePicker approach.
+    let win = null;
     try {
-      setLbl("⟳ Loading…");
-      await Promise.all(PDF_LIBS.map(loadScriptOnce));
-      const jsPDFCtor = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
-      if (!jsPDFCtor || !window.html2canvas) throw new Error("PDF libraries failed to load.");
+      win = window.open("", "_blank");
+      if (!win) throw new Error("Pop-up blocked. Allow pop-ups for this site, then try again.");
+      win.document.write('<!DOCTYPE html><meta charset="utf-8"><title>Preparing report</title>' +
+        '<body style="font-family:-apple-system,sans-serif;padding:44px;color:#666">' +
+        "Preparing report… / レポートを準備中…</body>");
+      win.document.close();
 
       setLbl("⟳ Gathering…");
       const html = await buildReportHtml();
 
-      let stage = document.getElementById("pdf-stage");
-      if (!stage) { stage = document.createElement("div"); stage.id = "pdf-stage"; document.body.appendChild(stage); }
-      stage.innerHTML = html;
-
-      setLbl("⟳ Rendering…");
-      const pdf = new jsPDFCtor({ unit: "mm", format: "a4", orientation: "portrait" });
-      const pageW = 210, pageH = 297, margin = 12;
-      const contentW = pageW - margin * 2;
-      let cursor = margin;
-      let firstPage = true;
-
-      const blocks = Array.prototype.slice.call(stage.querySelectorAll(".pdf-block"));
-      for (let i = 0; i < blocks.length; i++) {
-        const canvas = await window.html2canvas(blocks[i], { scale: 2, backgroundColor: "#ffffff", logging: false, useCORS: true });
-        if (!canvas.width || !canvas.height) continue;
-        const hMm = (canvas.height / canvas.width) * contentW;
-        const img = canvas.toDataURL("image/jpeg", 0.92);
-
-        if (hMm > pageH - margin * 2) {
-          // Block taller than a page — slice it across pages.
-          const pxPerMm = canvas.width / contentW;
-          const sliceHpx = Math.floor((pageH - margin * 2) * pxPerMm);
-          let y = 0;
-          while (y < canvas.height) {
-            const h = Math.min(sliceHpx, canvas.height - y);
-            const c2 = document.createElement("canvas");
-            c2.width = canvas.width; c2.height = h;
-            c2.getContext("2d").drawImage(canvas, 0, y, canvas.width, h, 0, 0, canvas.width, h);
-            if (!firstPage) pdf.addPage(); firstPage = false;
-            pdf.addImage(c2.toDataURL("image/jpeg", 0.92), "JPEG", margin, margin, contentW, h / pxPerMm);
-            cursor = margin + h / pxPerMm;
-            y += h;
-          }
-          continue;
-        }
-
-        if (!firstPage && cursor + hMm > pageH - margin) { pdf.addPage(); cursor = margin; }
-        if (firstPage) { cursor = margin; firstPage = false; }
-        pdf.addImage(img, "JPEG", margin, cursor, contentW, hMm);
-        cursor += hMm;
-      }
-
-      // Page numbers
-      const total = pdf.internal.getNumberOfPages();
-      for (let p = 1; p <= total; p++) {
-        pdf.setPage(p);
-        pdf.setFontSize(8); pdf.setTextColor(150);
-        pdf.text(String(p) + " / " + String(total), pageW - margin, pageH - 6, { align: "right" });
-      }
-
-      stage.innerHTML = "";
-      const blob = pdf.output("blob");
       const fname = "Japan-Pulse-Survey-" + SURVEY_ROUND.replace(/\s+/g, "-") + "-Report-" +
-        new Date().toISOString().slice(0, 10) + ".pdf";
+        new Date().toISOString().slice(0, 10);
 
-      setLbl("⟳ Saving…");
-      if (window.showSaveFilePicker) {
-        try {
-          const handle = await window.showSaveFilePicker({
-            suggestedName: fname,
-            types: [{ description: "PDF document", accept: { "application/pdf": [".pdf"] } }]
-          });
-          const w = await handle.createWritable();
-          await w.write(blob); await w.close();
-        } catch (err) {
-          if (err && err.name === "AbortError") { if (btn) { btn.disabled = false; btn.innerHTML = orig; } return; }
-          throw err;
-        }
-      } else {
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob); a.download = fname;
-        document.body.appendChild(a); a.click(); a.remove();
-        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-      }
+      // Chrome uses document.title as the default filename in the Save-as-PDF dialog.
+      win.document.open();
+      win.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>' + fname + "</title><style>" +
+        collectRootVars() + "\n" + collectReportCss() + "\n" + PRINT_CSS +
+        "</style></head><body>" + html + "</body></html>");
+      win.document.close();
+
+      setLbl("⟳ Opening print…");
+      await new Promise(r => setTimeout(r, 800));  // let layout and fonts settle
+      win.focus();
+      win.print();
     } catch (e) {
       console.warn(e);
+      if (win) { try { win.close(); } catch (e2) {} }
       alert("Could not generate the PDF report.\n\n" + (e && e.message ? e.message : e));
     } finally {
       if (btn) { btn.disabled = false; btn.innerHTML = orig; }
