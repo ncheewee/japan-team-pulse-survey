@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="survey-closed">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -682,7 +682,7 @@
       set("r-rv-since", "Since " + R.priorEn + " / " + R.priorJp + "\u4EE5\u964D");
       set("r-rv-followthrough", "Followed through on " + R.priorEn + " commitment? / " + R.priorJp + "\u306E\u30B3\u30DF\u30C3\u30C8\u30E1\u30F3\u30C8\u9054\u6210\u5EA6");
     }
-    if (!SURVEY_OPEN) document.documentElement.classList.add("survey-closed");
+    document.documentElement.classList.toggle("survey-closed", !SURVEY_OPEN);
   }
   applyRound();
   // AI insights run server-side in Apps Script (using a key stored in Script Properties there),
