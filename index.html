@@ -262,6 +262,13 @@
   .pdf-bar-bg { flex:1; height:13px; background:#f1ece5; border-radius:7px; overflow:hidden; }
   .pdf-bar-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary-mid)); }
   .pdf-bar-num { width:20px; color:#6a6a6a; }
+  .gate-card { display:none; background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); padding:40px 28px; margin-bottom:20px; text-align:center; }
+  html.survey-closed .progress-wrap,
+  html.survey-closed .card,
+  html.survey-closed #thank-you { display:none !important; }
+  html.survey-closed #r-intro,
+  html.survey-closed .anon-badge { display:none; }
+  html.survey-closed .gate-card { display:block; }
 </style>
 </head>
 <body>
@@ -356,6 +363,11 @@
     <p id="r-intro">Round two! Your honest feedback helps us grow together. This survey is <strong>completely anonymous</strong>.<br>
     <span id="r-intro-jp" style="font-size:.85rem;color:#7a6c72">第2回です。正直なフィードバックが私たちの成長を助けます。このアンケートは<strong>完全に匿名</strong>です。</span></p>
     <span class="anon-badge">🔒 Anonymous · 匿名</span>
+  </div>
+  <div class="gate-card" id="survey-gate">
+    <div class="section-title">Not open yet<span class="jp">まだ開始していません</span></div>
+    <p class="section-desc" style="margin-bottom:0">This survey is not open yet. Please wait for the official invitation.<br>
+    <span style="font-size:.85rem;color:#7a6c72">このサーベイはまだ開始していません。正式な案内をお待ちください。</span></p>
   </div>
   <div class="progress-wrap">
     <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill" style="width:14%"></div></div>
@@ -599,7 +611,10 @@
   const SHEET_URL = "https://script.google.com/macros/s/AKfycbxi0KEzfuD35hl84N1cLclQbrlL6i0ug9KDlb0AfjjADpDxb9uwx07P5trVKWj7I46q/exec";
   // One value to change each round — the Apps Script auto-creates a tab named this in the same spreadsheet.
   // No new Sheet or new Apps Script deployment needed next quarter, just update this string.
-  const SURVEY_ROUND = "Summer 2026";
+  const SURVEY_ROUND = "Autumn 2026";
+  // Flip to true when the team is invited. Until then the landing page
+  // shows a closed message and the form cannot be submitted.
+  const SURVEY_OPEN = false;
 
   /* ---------------------------------------------------------------------------
      Every round-specific difference lives here. Changing SURVEY_ROUND above is
@@ -667,6 +682,7 @@
       set("r-rv-since", "Since " + R.priorEn + " / " + R.priorJp + "\u4EE5\u964D");
       set("r-rv-followthrough", "Followed through on " + R.priorEn + " commitment? / " + R.priorJp + "\u306E\u30B3\u30DF\u30C3\u30C8\u30E1\u30F3\u30C8\u9054\u6210\u5EA6");
     }
+    if (!SURVEY_OPEN) document.documentElement.classList.add("survey-closed");
   }
   applyRound();
   // AI insights run server-side in Apps Script (using a key stored in Script Properties there),
@@ -838,9 +854,10 @@
   }
 
   async function submitForm() {
+    if (!SURVEY_OPEN) return;
     const p={
       round:SURVEY_ROUND,
-      season:"summer",
+      season:R.theme,
       morale:parseInt(document.getElementById("morale-slider").value),
       progressSinceLast:choiceAnswers.progress||"", progressComment:document.getElementById("progress-comment").value.trim(),
       hq:[...ratings.hq], hqComment:document.getElementById("hq-comment").value.trim(),
